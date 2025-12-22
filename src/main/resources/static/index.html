@@ -1,0 +1,3063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlgoGlimps</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        nav {
+            background-color: #1e293b; /* Dark slate for navbar */
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        nav h1 {
+            color: #ffffff;
+            font-size: 1.75rem; /* text-2xl */
+            font-weight: 700; /* font-bold */
+        }
+        .nav-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .nav-section label {
+            color: #cbd5e1; /* Light gray text */
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .nav-section select, .nav-section button {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: none;
+        }
+        .nav-section select {
+            background-color: #334155; /* Darker slate */
+            color: #ffffff;
+            appearance: none; /* Remove default arrow */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='white'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.2em;
+        }
+        .nav-section select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4); /* Focus ring */
+        }
+        .nav-section button {
+            background-color: #4f46e5; /* Indigo */
+            color: #ffffff;
+        }
+        .nav-section button:hover {
+            background-color: #4338ca; /* Darker indigo */
+            transform: translateY(-1px);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            max-width: 90%;
+            width: 1000px; /* Increased max-width for better visualization */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        canvas {
+            background-color: #e2e8f0; /* Lighter blue-gray for canvas */
+            border-radius: 0.75rem;
+            border: 1px solid #cbd5e1;
+            display: block;
+            width: 100%;
+            max-width: 900px; /* Match container width */
+            height: 500px; /* Increased height for graph visualization */
+            margin-bottom: 1.5rem;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #4f46e5; /* Indigo */
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca; /* Darker indigo */
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background-color: #6b7280; /* Gray */
+            color: #ffffff;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563; /* Darker gray */
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #4a5568; /* Darker gray text */
+        }
+        input[type="range"] {
+            width: 150px;
+            -webkit-appearance: none;
+            height: 8px;
+            background: #cbd5e1;
+            outline: none;
+            border-radius: 4px;
+            transition: opacity .2s;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .info-box {
+            background-color: #f8fafc; /* Lighter background for info */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 900px;
+            border: 1px solid #e2e8f0;
+            color: #334155; /* Darker text */
+        }
+        .info-box h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #1e293b; /* Even darker text */
+        }
+        .info-box p {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        .info-box pre {
+            background-color: #1e293b; /* Dark background for code */
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace; /* Monospace font for code */
+            font-size: 0.9rem;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .input-group label {
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500; /* font-medium */
+            color: #4a5568; /* Darker gray text */
+        }
+        .input-group select, .input-group input[type="number"] {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem; /* rounded-md */
+            border: 1px solid #cbd5e1;
+            background-color: #ffffff;
+            color: #334155;
+            font-size: 0.875rem;
+        }
+        /* Grid-specific styles */
+        #gridCanvas {
+            background-color: #ffffff; /* White background for grid */
+            border-radius: 0.75rem;
+            border: 1px solid #cbd5e1;
+            display: block;
+            width: 100%;
+            max-width: 900px;
+            height: 500px;
+            margin-bottom: 1.5rem;
+        }
+        .grid-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+
+        /* Custom Modal Styling (for alerts) */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border-radius: 0.75rem;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .modal-content h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        .modal-content p {
+            margin-bottom: 1.5rem;
+            color: #334155;
+        }
+        .modal-content button {
+            background-color: #4f46e5;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+        .modal-content button:hover {
+            background-color: #4338ca;
+        }
+
+        /* Matrix Table Styling */
+        .matrix-container {
+            width: 100%;
+            max-width: 900px;
+            margin-top: 1.5rem;
+            overflow-x: auto;
+            background-color: #f8fafc;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
+        }
+        .matrix-container h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #1e293b;
+            text-align: center;
+        }
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+        }
+        .matrix-table th, .matrix-table td {
+            border: 1px solid #cbd5e1;
+            padding: 0.5rem;
+            text-align: center;
+            min-width: 40px; /* Ensure cells are wide enough */
+        }
+        .matrix-table th {
+            background-color: #e2e8f0;
+            color: #334155;
+            font-weight: 600;
+        }
+        .matrix-table td {
+            background-color: #ffffff;
+            color: #334155;
+        }
+        .matrix-table td.highlight-cell {
+            background-color: #f59e0b; /* Amber for current cell */
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .matrix-table td.updated-cell {
+            background-color: #10b981; /* Green for updated cell */
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        /* Compare Mode Specific Styles */
+        .compare-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px; /* Wider for comparison */
+        }
+        .compare-section {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1; /* Allow sections to grow */
+        }
+        .compare-canvases {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+        .compare-canvas-wrapper {
+            flex: 1; /* Each canvas wrapper takes equal space */
+            min-width: 400px; /* Minimum width for each canvas */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .compare-canvas {
+            background-color: #e2e8f0;
+            border-radius: 0.75rem;
+            border: 1px solid #cbd5e1;
+            display: block;
+            width: 100%;
+            height: 350px; /* Smaller height for comparison */
+        }
+        .compare-results {
+            margin-top: 1.5rem;
+            width: 100%;
+            max-width: 800px;
+            background-color: #f8fafc;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            color: #334155;
+        }
+        .compare-results h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #1e293b;
+            text-align: center;
+        }
+        .compare-results .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .compare-results .result-item:last-child {
+            border-bottom: none;
+        }
+        .compare-results .result-item span:first-child {
+            font-weight: 600;
+        }
+
+        /* Chatbot Popup Styles */
+        #chatPopup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            z-index: 100; /* Ensure it's above other content */
+            overflow: hidden; /* Hide overflow for rounded corners */
+            transform: scale(0); /* Start hidden and scaled down */
+            transform-origin: bottom right;
+            transition: all 0.3s ease-in-out;
+            visibility: hidden; /* Hidden for accessibility until active */
+        }
+        #chatPopup.open {
+            transform: scale(1);
+            visibility: visible;
+        }
+
+        #chatPopupHeader {
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 0.75rem 1rem;
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        #chatPopupHeader button {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            margin: 0;
+        }
+
+        #chatMessages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .chat-message {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            line-height: 1.4;
+        }
+        .chat-message.user {
+            background-color: #4f46e5; /* Indigo */
+            color: #ffffff;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+        }
+        .chat-message.bot {
+            background-color: #e2e8f0; /* Light blue-gray */
+            color: #1e293b;
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+        }
+        .chat-input-area {
+            display: flex;
+            padding: 1rem;
+            gap: 0.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        #chatInput {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #cbd5e1;
+            background-color: #ffffff;
+            color: #334155;
+        }
+        #chatInput:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        }
+        .chat-buttons {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0 1rem 1rem; /* Padding at bottom of popup */
+            justify-content: flex-end;
+        }
+
+        /* Floating Action Button (FAB) */
+        #chatFab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #4f46e5; /* Indigo */
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 101; /* Above the popup when closed */
+            transition: all 0.3s ease-in-out;
+        }
+        #chatFab:hover {
+            background-color: #4338ca;
+            transform: translateY(-2px);
+        }
+        #chatFab.hidden-fab {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>AlgoGlimps</h1>
+        <div class="nav-section">
+            <label for="modeSelect">Mode:</label>
+            <select id="modeSelect">
+                <option value="graph">Graph</option>
+                <option value="grid">Grid</option>
+                <option value="compare">Compare</option>
+            </select>
+        </div>
+        <div class="nav-section">
+            <label for="algorithmSelect">Algorithm:</label>
+            <select id="algorithmSelect">
+                <option value="bfs">Breadth-First Search (BFS)</option>
+                <option value="dfs">Depth-First Search (DFS)</option>
+                <option value="dijkstra">Dijkstra's Algorithm</option>
+                <option value="floyd-warshall">Floyd-Warshall Algorithm</option>
+                <option value="mst">Minimum Spanning Tree</option>
+            </select>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div id="graphContainer" class="container">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4" id="graphAlgorithmTitle">Breadth-First Search (BFS)</h2>
+            <canvas id="visualizationCanvas"></canvas>
+
+            <div class="controls">
+                <div class="input-group" id="graphInteractionModeGroup">
+                    <label for="graphInteractionMode">Interaction Mode:</label>
+                    <select id="graphInteractionMode" class="form-select">
+                        <option value="select">Select/Move Node</option>
+                        <option value="add-node">Add Node</option>
+                        <option value="remove-node">Remove Node</option>
+                        <option value="add-edge">Add Edge</option>
+                        <option value="remove-edge">Remove Edge</option>
+                    </select>
+                </div>
+                <div class="input-group" id="newEdgeWeightGroup" style="display: none;">
+                    <label for="newEdgeWeight">Edge Weight:</label>
+                    <input type="number" id="newEdgeWeight" value="1" min="1" class="form-input w-20">
+                </div>
+                <div class="input-group" id="startNodeGroup">
+                    <label for="startNodeSelect">Start Node:</label>
+                    <select id="startNodeSelect" class="form-select"></select>
+                </div>
+                <div class="input-group" id="targetNodeGroup" style="display: none;">
+                    <label for="targetNodeSelect">Target Node:</label>
+                    <select id="targetNodeSelect" class="form-select"></select>
+                </div>
+                <button id="startButton" class="btn btn-primary">Start</button>
+                <button id="resetButton" class="btn btn-secondary">Reset</button>
+                <div class="slider-container">
+                    <label for="speedSlider" class="text-sm font-medium">Speed:</label>
+                    <input type="range" id="speedSlider" min="10" max="1000" value="200">
+                    <span id="speedValue" class="text-sm">200ms</span>
+                </div>
+                <div id="floydPathSelectionGroup" style="display: none; width: 100%; justify-content: center; gap: 1rem;">
+                    <div class="input-group">
+                        <label for="floydPathStartNode">Path Start:</label>
+                        <select id="floydPathStartNode" class="form-select"></select>
+                    </div>
+                    <div class="input-group">
+                        <label for="floydPathEndNode">Path End:</label>
+                        <select id="floydPathEndNode" class="form-select"></select>
+                    </div>
+                    <button id="showFloydPathButton" class="btn btn-primary">Show Path</button>
+                </div>
+                <button id="explainAlgoButton" class="btn btn-primary">✨ Get Detailed Explanation</button>
+            </div>
+
+            <div class="info-box" id="graphAlgorithmInfoBox">
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-start justify-between gap-4">
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-semibold" id="algoInfoHeading">Breadth-First Search (BFS) Algorithm</h3>
+                            <p class="text-sm text-gray-300" id="algoInfoDescPrimary">
+                                Breadth-First Search (BFS) is an algorithm for traversing or searching tree or graph data structures. It explores all neighbor nodes at the current depth before moving to the next depth level.
+                            </p>
+                            <p class="text-sm text-gray-300" id="algoInfoDescSecondary">
+                                BFS is commonly used to find the shortest path in an unweighted graph.
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label for="codeLanguageSelect" class="text-sm font-semibold text-gray-200">Language</label>
+                            <select id="codeLanguageSelect" class="form-select bg-gray-900 text-gray-100 border-gray-700">
+                                <option value="java">Java</option>
+                                <option value="cpp">C++</option>
+                                <option value="python">Python</option>
+                                <option value="javascript">JavaScript</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+                        <div id="codeEditor" class="h-72 w-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="llmExplanationBox" class="info-box mt-4 hidden">
+                <h3>Detailed Explanation (Powered by Gemini)</h3>
+                <p id="llmExplanationContent">
+                    </p>
+                <div id="llmLoadingIndicator" class="hidden text-center text-gray-500 mt-2">
+                    Generating explanation...
+                </div>
+            </div>
+
+            <div id="matrixContainer" class="matrix-container hidden">
+                <h4>Distance Matrix</h4>
+                <div id="distanceMatrixTable"></div>
+                </div>
+        </div>
+
+        <div id="gridContainer" class="container hidden">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4" id="gridAlgorithmTitle">Grid Visualization</h2>
+            <canvas id="gridCanvas"></canvas>
+            <div class="grid-controls">
+                <div class="input-group" id="gridInteractionModeGroup">
+                    <label for="gridInteractionMode">Interaction Mode:</label>
+                    <select id="gridInteractionMode" class="form-select">
+                        <option value="none">None</option>
+                        <option value="set-start">Set Start</option>
+                        <option value="set-end">Set End</option>
+                        <option value="add-wall">Add Wall</option>
+                        <option value="remove-wall">Remove Wall</option>
+                    </select>
+                </div>
+                <button id="runGridAlgorithmButton" class="btn btn-primary">Run Grid Algorithm</button>
+                <button id="clearGridButton" class="btn btn-secondary">Clear Grid</button>
+                <div class="slider-container">
+                    <label for="gridSpeedSlider" class="text-sm font-medium">Speed:</label>
+                    <input type="range" id="gridSpeedSlider" min="10" max="1000" value="200">
+                    <span id="gridSpeedValue" class="text-sm">200ms</span>
+                </div>
+            </div>
+            <div class="info-box" id="gridAlgorithmInfoBox">
+                <h3>Grid Algorithms (Coming Soon)</h3>
+                <p>
+                    This section will feature algorithms that operate on a grid, such as pathfinding algorithms (e.g., A*, Dijkstra on a grid) and maze generation algorithms.
+                </p>
+                <p>
+                    You will be able to define start/end points, add walls, and watch the algorithms find paths or generate mazes.
+                </p>
+                <p class="text-sm text-gray-300">Switch the language dropdown in the code panel above to explore BFS implementations while the grid tools evolve.</p>
+            </div>
+        </div>
+
+        <div id="compareContainer" class="container hidden">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Algorithm Comparison</h2>
+            <div class="controls">
+                <div class="input-group">
+                    <label for="compareAlgoSelect1">Algorithm 1:</label>
+                    <select id="compareAlgoSelect1" class="form-select">
+                        <option value="bfs">BFS</option>
+                        <option value="dfs">DFS</option>
+                        <option value="dijkstra">Dijkstra</option>
+                        <option value="floyd-warshall">Floyd-Warshall</option>
+                        <option value="mst">MST</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="compareAlgoSelect2">Algorithm 2:</label>
+                    <select id="compareAlgoSelect2" class="form-select">
+                        <option value="dfs">DFS</option>
+                        <option value="bfs">BFS</option>
+                        <option value="dijkstra">Dijkstra</option>
+                        <option value="floyd-warshall">Floyd-Warshall</option>
+                        <option value="mst">MST</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="compareStartNode">Start Node:</label>
+                    <select id="compareStartNode" class="form-select"></select>
+                </div>
+                   <div class="input-group" id="compareTargetNodeGroup" style="display: none;">
+                    <label for="compareTargetNode">Target Node:</label>
+                    <select id="compareTargetNode" class="form-select"></select>
+                </div>
+                <button id="runComparisonButton" class="btn btn-primary">Run Comparison</button>
+                <button id="resetComparisonButton" class="btn btn-secondary">Reset Comparison</button>
+                <div class="slider-container">
+                    <label for="compareSpeedSlider" class="text-sm font-medium">Speed:</label>
+                    <input type="range" id="compareSpeedSlider" min="10" max="1000" value="200">
+                    <span id="compareSpeedValue" class="text-sm">200ms</span>
+                </div>
+            </div>
+
+            <div class="compare-canvases">
+                <div class="compare-canvas-wrapper">
+                    <h3 class="text-lg font-semibold mb-2" id="compareCanvasTitle1">Algorithm 1</h3>
+                    <canvas id="compareCanvas1" class="compare-canvas"></canvas>
+                </div>
+                <div class="compare-canvas-wrapper">
+                    <h3 class="text-lg font-semibold mb-2" id="compareCanvasTitle2">Algorithm 2</h3>
+                    <canvas id="compareCanvas2" class="compare-canvas"></canvas>
+                </div>
+            </div>
+            <div id="compareResults" class="compare-results hidden">
+                <h3>Comparison Results</h3>
+                <div id="compareResult1" class="result-item"></div>
+                <div id="compareResult2" class="result-item"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="chatFab">💬</div>
+
+    <div id="chatPopup">
+        <div id="chatPopupHeader">
+            <span>AlgoGlimps Buddy</span>
+            <button id="closeChatButton">&times;</button>
+        </div>
+        <div id="chatMessages">
+            <div class="chat-message bot">Hi there! I'm AlgoGlimps Buddy. How can I help you with algorithms today?</div>
+        </div>
+        <div id="chatLoadingIndicator" class="hidden text-center text-gray-500 mt-2">
+            AlgoGlimps Buddy is typing...
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Ask me anything about algorithms..." class="flex-grow">
+            <button id="sendChatButton" class="btn btn-primary">Send</button>
+        </div>
+        <div class="chat-buttons">
+            <button id="clearChatButton" class="btn btn-secondary">Clear Chat</button>
+        </div>
+    </div>
+
+    <div id="customModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle"></h3>
+            <p id="modalMessage"></p>
+            <button id="modalCloseButton">OK</button>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+    <script>
+        // Global state variables
+        let currentMode = 'graph'; // 'graph', 'grid', 'compare'
+        let currentAlgorithm = 'bfs'; // 'bfs', 'dfs', 'dijkstra', 'floyd-warshall', 'mst'
+        let animationSpeed = 200; // Milliseconds (used for both graph and grid animations)
+        let isAlgorithmRunning = false; // Flag to prevent multiple runs
+
+        // The URL of your Spring Boot backend
+        const serverUrl = 'http://localhost:8081';
+
+        // DOM Elements
+        const modeSelect = document.getElementById('modeSelect');
+        const algorithmSelect = document.getElementById('algorithmSelect');
+
+        const graphContainer = document.getElementById('graphContainer');
+        const gridContainer = document.getElementById('gridContainer');
+        const compareContainer = document.getElementById('compareContainer');
+        
+        const graphAlgorithmTitle = document.getElementById('graphAlgorithmTitle');
+        const graphAlgorithmInfoBox = document.getElementById('graphAlgorithmInfoBox');
+        const algoInfoHeading = document.getElementById('algoInfoHeading');
+        const algoInfoDescPrimary = document.getElementById('algoInfoDescPrimary');
+        const algoInfoDescSecondary = document.getElementById('algoInfoDescSecondary');
+        const codeLanguageSelect = document.getElementById('codeLanguageSelect');
+        const codeEditorElement = document.getElementById('codeEditor');
+        const gridAlgorithmTitle = document.getElementById('gridAlgorithmTitle');
+        const gridAlgorithmInfoBox = document.getElementById('gridAlgorithmInfoBox');
+
+        // Code editor configuration
+        const editorSamples = {
+            bfs: {
+                java: `import java.util.*;
+
+void bfs(Map<Integer, List<Integer>> graph, int start) {
+    Queue<Integer> q = new ArrayDeque<>();
+    Set<Integer> seen = new HashSet<>();
+    q.add(start);
+    seen.add(start);
+
+    while (!q.isEmpty()) {
+        int node = q.poll();
+        System.out.println(node);
+        for (int nei : graph.getOrDefault(node, List.of())) {
+            if (seen.add(nei)) q.add(nei);
+        }
+    }
+}`,
+                cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+void bfs(const unordered_map<int, vector<int>>& g, int start) {
+    queue<int> q;
+    unordered_set<int> seen;
+    q.push(start);
+    seen.insert(start);
+
+    while (!q.empty()) {
+        int node = q.front(); q.pop();
+        cout << node << " ";
+        for (int nei : g.at(node)) {
+            if (!seen.count(nei)) {
+                seen.insert(nei);
+                q.push(nei);
+            }
+        }
+    }
+}`,
+                python: `from collections import deque
+
+def bfs(graph: dict[int, list[int]], start: int) -> None:
+    q = deque([start])
+    seen = {start}
+
+    while q:
+        node = q.popleft()
+        print(node)
+        for nei in graph.get(node, []):
+            if nei not in seen:
+                seen.add(nei)
+                q.append(nei)
+`,
+                javascript: `function bfs(graph, start) {
+  const q = [start];
+  const seen = new Set([start]);
+
+  while (q.length) {
+    const node = q.shift();
+    console.log(node);
+    for (const nei of graph[node] || []) {
+      if (!seen.has(nei)) {
+        seen.add(nei);
+        q.push(nei);
+      }
+    }
+  }
+}`
+            },
+            dfs: {
+                java: `import java.util.*;
+
+void dfs(Map<Integer, List<Integer>> graph, int start) {
+    Set<Integer> seen = new HashSet<>();
+    Deque<Integer> stack = new ArrayDeque<>();
+    stack.push(start);
+
+    while (!stack.isEmpty()) {
+        int node = stack.pop();
+        if (!seen.add(node)) continue;
+        System.out.println(node);
+        for (int nei : graph.getOrDefault(node, List.of())) {
+            stack.push(nei);
+        }
+    }
+}`,
+                cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+void dfs(const unordered_map<int, vector<int>>& g, int start) {
+    vector<int> stack{start};
+    unordered_set<int> seen;
+
+    while (!stack.empty()) {
+        int node = stack.back(); stack.pop_back();
+        if (seen.count(node)) continue;
+        seen.insert(node);
+        cout << node << " ";
+        for (int nei : g.at(node)) stack.push_back(nei);
+    }
+}`,
+                python: `def dfs(graph: dict[int, list[int]], start: int) -> None:
+    stack = [start]
+    seen = set()
+
+    while stack:
+        node = stack.pop()
+        if node in seen:
+            continue
+        seen.add(node)
+        print(node)
+        for nei in graph.get(node, []):
+            stack.append(nei)
+`,
+                javascript: `function dfs(graph, start) {
+  const stack = [start];
+  const seen = new Set();
+
+  while (stack.length) {
+    const node = stack.pop();
+    if (seen.has(node)) continue;
+    seen.add(node);
+    console.log(node);
+    for (const nei of graph[node] || []) stack.push(nei);
+  }
+}`
+            },
+            dijkstra: {
+                java: `import java.util.*;
+
+Map<Integer, Integer> dijkstra(Map<Integer, List<int[]>> graph, int start) {
+    Map<Integer, Integer> dist = new HashMap<>();
+    graph.keySet().forEach(n -> dist.put(n, Integer.MAX_VALUE));
+    dist.put(start, 0);
+    PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
+    pq.add(new int[]{start, 0});
+
+    while (!pq.isEmpty()) {
+        int[] cur = pq.poll();
+        int node = cur[0], d = cur[1];
+        if (d != dist.get(node)) continue;
+        for (int[] edge : graph.getOrDefault(node, List.of())) {
+            int nei = edge[0], w = edge[1];
+            int nd = d + w;
+            if (nd < dist.get(nei)) {
+                dist.put(nei, nd);
+                pq.add(new int[]{nei, nd});
+            }
+        }
+    }
+    return dist;
+}`,
+                cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+unordered_map<int, int> dijkstra(const unordered_map<int, vector<pair<int,int>>>& g, int start) {
+    unordered_map<int, int> dist;
+    for (auto& [n, _] : g) dist[n] = INT_MAX;
+    dist[start] = 0;
+    using P = pair<int,int>;
+    priority_queue<P, vector<P>, greater<P>> pq;
+    pq.push({0, start});
+
+    while (!pq.empty()) {
+        auto [d, node] = pq.top(); pq.pop();
+        if (d != dist[node]) continue;
+        for (auto [nei, w] : g.at(node)) {
+            int nd = d + w;
+            if (nd < dist[nei]) {
+                dist[nei] = nd;
+                pq.push({nd, nei});
+            }
+        }
+    }
+    return dist;
+}`,
+                python: `import heapq
+
+def dijkstra(graph: dict[int, list[tuple[int,int]]], start: int):
+    dist = {n: float('inf') for n in graph}
+    dist[start] = 0
+    pq = [(0, start)]
+
+    while pq:
+        d, node = heapq.heappop(pq)
+        if d != dist[node]:
+            continue
+        for nei, w in graph.get(node, []):
+            nd = d + w
+            if nd < dist[nei]:
+                dist[nei] = nd
+                heapq.heappush(pq, (nd, nei))
+    return dist
+`,
+                javascript: `function dijkstra(graph, start) {
+  const dist = Object.fromEntries(Object.keys(graph).map(n => [n, Infinity]));
+  dist[start] = 0;
+  const pq = [[0, start]];
+
+  while (pq.length) {
+    pq.sort((a, b) => a[0] - b[0]);
+    const [d, node] = pq.shift();
+    if (d !== dist[node]) continue;
+    for (const [nei, w] of graph[node] || []) {
+      const nd = d + w;
+      if (nd < dist[nei]) {
+        dist[nei] = nd;
+        pq.push([nd, nei]);
+      }
+    }
+  }
+  return dist;
+}`
+            },
+            'floyd-warshall': {
+                java: `void floydWarshall(int[][] dist) {
+    int n = dist.length;
+    for (int k = 0; k < n; k++)
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+}`,
+                cpp: `void floydWarshall(vector<vector<int>>& dist) {
+    int n = dist.size();
+    for (int k = 0; k < n; ++k)
+        for (int i = 0; i < n; ++i)
+            for (int j = 0; j < n; ++j)
+                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+}`,
+                python: `def floyd_warshall(dist: list[list[int]]) -> None:
+    n = len(dist)
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
+`,
+                javascript: `function floydWarshall(dist) {
+  const n = dist.length;
+  for (let k = 0; k < n; k++)
+    for (let i = 0; i < n; i++)
+      for (let j = 0; j < n; j++)
+        dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+  return dist;
+}`
+            },
+            mst: {
+                java: `import java.util.*;
+
+int prim(int n, List<int[]> edges) {
+    List<List<int[]>> g = new ArrayList<>();
+    for (int i = 0; i < n; i++) g.add(new ArrayList<>());
+    for (int[] e : edges) {
+        int u = e[0], v = e[1], w = e[2];
+        g.get(u).add(new int[]{v, w});
+        g.get(v).add(new int[]{u, w});
+    }
+    boolean[] used = new boolean[n];
+    PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
+    pq.add(new int[]{0, 0});
+    int cost = 0;
+
+    while (!pq.isEmpty()) {
+        int[] cur = pq.poll();
+        int node = cur[0], w = cur[1];
+        if (used[node]) continue;
+        used[node] = true;
+        cost += w;
+        for (int[] edge : g.get(node)) pq.add(edge);
+    }
+    return cost;
+}`,
+                cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int prim(int n, const vector<tuple<int,int,int>>& edges) {
+    vector<vector<pair<int,int>>> g(n);
+    for (auto [u, v, w] : edges) {
+        g[u].push_back({v, w});
+        g[v].push_back({u, w});
+    }
+    vector<int> used(n);
+    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<>> pq;
+    pq.push({0, 0});
+    int cost = 0;
+    while (!pq.empty()) {
+        auto [w, node] = pq.top(); pq.pop();
+        if (used[node]) continue;
+        used[node] = 1;
+        cost += w;
+        for (auto [nei, nw] : g[node]) pq.push({nw, nei});
+    }
+    return cost;
+}`,
+                python: `import heapq
+
+def prim(n: int, edges: list[tuple[int,int,int]]) -> int:
+    g: list[list[tuple[int,int]]] = [[] for _ in range(n)]
+    for u, v, w in edges:
+        g[u].append((v, w))
+        g[v].append((u, w))
+
+    used = [False] * n
+    pq = [(0, 0)]
+    cost = 0
+
+    while pq:
+        w, node = heapq.heappop(pq)
+        if used[node]:
+            continue
+        used[node] = True
+        cost += w
+        for nei, nw in g[node]:
+            heapq.heappush(pq, (nw, nei))
+    return cost
+`,
+                javascript: `function prim(n, edges) {
+  const g = Array.from({ length: n }, () => []);
+  for (const [u, v, w] of edges) {
+    g[u].push([v, w]);
+    g[v].push([u, w]);
+  }
+  const used = Array(n).fill(false);
+  const pq = [[0, 0]];
+  let cost = 0;
+
+  while (pq.length) {
+    pq.sort((a, b) => a[0] - b[0]);
+    const [w, node] = pq.shift();
+    if (used[node]) continue;
+    used[node] = true;
+    cost += w;
+    for (const [nei, nw] of g[node]) pq.push([nw, nei]);
+  }
+  return cost;
+}`
+            }
+        };
+
+        const algorithmDescriptions = {
+            bfs: {
+                title: 'Breadth-First Search (BFS) Algorithm',
+                primary: 'Breadth-First Search explores neighbors level by level using a queue.',
+                secondary: 'Commonly used to find the shortest path in unweighted graphs.'
+            },
+            dfs: {
+                title: 'Depth-First Search (DFS) Algorithm',
+                primary: 'Depth-First Search explores as far as possible down each branch before backtracking.',
+                secondary: 'Useful for connected components, cycle detection, and topological sorting.'
+            },
+            dijkstra: {
+                title: "Dijkstra's Algorithm",
+                primary: 'Computes the shortest paths from a source to all nodes with non-negative edge weights.',
+                secondary: 'Widely used in routing and navigation systems.'
+            },
+            'floyd-warshall': {
+                title: 'Floyd-Warshall Algorithm',
+                primary: 'All-pairs shortest path algorithm using dynamic programming over a distance matrix.',
+                secondary: 'Handles positive or negative edges (no negative cycles).'
+            },
+            mst: {
+                title: "Minimum Spanning Tree (Prim's Algorithm)",
+                primary: 'Prim builds a spanning tree by greedily expanding from a start node using the cheapest edge.',
+                secondary: 'Great for network design, layout, and clustering.'
+            }
+        };
+
+        const monacoBaseUrl = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min';
+        let codeEditor;
+        let currentEditorLanguage = codeLanguageSelect ? codeLanguageSelect.value : 'java';
+
+        const loadMonaco = () => new Promise((resolve) => {
+            if (window.monaco) {
+                return resolve(window.monaco);
+            }
+
+            const startMonaco = () => {
+                // eslint-disable-next-line no-undef
+                require.config({ paths: { 'vs': `${monacoBaseUrl}/vs` } });
+                // eslint-disable-next-line no-undef
+                require(['vs/editor/editor.main'], () => {
+                    window.monaco.editor.setTheme('vs-dark');
+                    resolve(window.monaco);
+                });
+            };
+
+            // If AMD loader already present, start Monaco immediately
+            if (window.require) {
+                startMonaco();
+                return;
+            }
+
+            const loader = document.createElement('script');
+            loader.src = `${monacoBaseUrl}/vs/loader.min.js`;
+            loader.onload = startMonaco;
+            document.body.appendChild(loader);
+        });
+
+        function getMonacoLanguage(lang) {
+            switch (lang) {
+                case 'java': return 'java';
+                case 'cpp': return 'cpp';
+                case 'python': return 'python';
+                default: return 'javascript';
+            }
+        }
+
+        function getSampleCode(algo, lang) {
+            const algorithmKey = editorSamples[algo] ? algo : 'bfs';
+            const languageKey = editorSamples[algorithmKey][lang] ? lang : 'javascript';
+            return editorSamples[algorithmKey][languageKey] || 'Sample coming soon.';
+        }
+
+        function updateGraphInfoContent(algo) {
+            const info = algorithmDescriptions[algo] || algorithmDescriptions.bfs;
+            algoInfoHeading.textContent = info.title;
+            algoInfoDescPrimary.textContent = info.primary;
+            algoInfoDescSecondary.textContent = info.secondary;
+        }
+
+        function updateEditorContent(algoOverride) {
+            if (!codeEditor || !window.monaco) return;
+            const targetAlgo = algoOverride || currentAlgorithm;
+            const code = getSampleCode(targetAlgo, currentEditorLanguage);
+            codeEditor.setValue(code);
+            const monacoLanguage = getMonacoLanguage(currentEditorLanguage);
+            window.monaco.editor.setModelLanguage(codeEditor.getModel(), monacoLanguage);
+        }
+
+        updateGraphInfoContent(currentAlgorithm);
+
+        loadMonaco().then(() => {
+            codeEditor = window.monaco.editor.create(codeEditorElement, {
+                value: getSampleCode(currentAlgorithm, currentEditorLanguage),
+                language: getMonacoLanguage(currentEditorLanguage),
+                theme: 'vs-dark',
+                readOnly: true,
+                automaticLayout: true,
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+            });
+        }).catch(() => {
+            if (codeEditorElement) {
+                codeEditorElement.innerHTML = '<div class="p-4 text-sm text-red-300">Failed to load Monaco editor. Please check your connection.</div>';
+            }
+        });
+
+        if (codeLanguageSelect) {
+            codeLanguageSelect.addEventListener('change', (event) => {
+                currentEditorLanguage = event.target.value;
+                updateEditorContent();
+            });
+        }
+
+
+        // Graph visualization elements (specific to graph mode)
+        const canvas = document.getElementById('visualizationCanvas');
+        const ctx = canvas.getContext('2d');
+        const startButton = document.getElementById('startButton'); // For graph algorithms
+        const resetButton = document.getElementById('resetButton'); // For graph algorithms
+        const speedSlider = document.getElementById('speedSlider'); // For graph algorithms
+        const speedValueSpan = document.getElementById('speedValue');
+        const startNodeSelect = document.getElementById('startNodeSelect');
+        const targetNodeSelect = document.getElementById('targetNodeSelect');
+        const startNodeGroup = document.getElementById('startNodeGroup');
+        const targetNodeGroup = document.getElementById('targetNodeGroup');
+
+        // Graph Customization Elements
+        const graphInteractionModeSelect = document.getElementById('graphInteractionMode');
+        const newEdgeWeightInput = document.getElementById('newEdgeWeight');
+        const newEdgeWeightGroup = document.getElementById('newEdgeWeightGroup');
+
+        // Custom Modal Elements
+        const customModal = document.getElementById('customModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+
+        // Matrix Visualization Elements
+        const matrixContainer = document.getElementById('matrixContainer');
+        const distanceMatrixTableDiv = document.getElementById('distanceMatrixTable');
+
+        // Floyd-Warshall Path Selection Elements
+        const floydPathSelectionGroup = document.getElementById('floydPathSelectionGroup');
+        const floydPathStartNodeSelect = document.getElementById('floydPathStartNode');
+        const floydPathEndNodeSelect = document.getElementById('floydPathEndNode');
+        const showFloydPathButton = document.getElementById('showFloydPathButton');
+        let floydWarshallResult = { finalMatrix: [], pathMatrix: [] }; // Store the result after FW runs
+
+        // MST specific state
+        let mstEdges = new Set(); // Edges that are part of the MST
+        let mstTotalWeight = 0;
+
+        // Grid specific state
+        const GRID_ROWS = 20;
+        const GRID_COLS = 30;
+        let cellSize = 0; // Will be calculated dynamically
+        let grid = []; // 2D array representing the grid (0: empty, 1: wall, 2: start, 3: end, 4: visited, 5: path)
+        let startGridNode = null; // {row, col}
+        let endGridNode = null; // {row, col}
+        let gridWalls = new Set(); // Stores "row-col" strings for wall positions
+        let gridVisited = new Set(); // For grid pathfinding visualization
+        let gridPath = []; // For grid path visualization
+        let isDrawingWalls = false; // Flag for continuous wall drawing
+        let currentGridAlgorithm = 'bfs-grid'; // Default grid algorithm
+
+        // Grid Visualization Elements
+        const gridCanvas = document.getElementById('gridCanvas');
+        const gridCtx = gridCanvas.getContext('2d');
+        const runGridAlgorithmButton = document.getElementById('runGridAlgorithmButton'); // For grid algorithms
+        const clearGridButton = document.getElementById('clearGridButton'); // For grid algorithms
+        const gridSpeedSlider = document.getElementById('gridSpeedSlider');
+        const gridSpeedValueSpan = document.getElementById('gridSpeedValue');
+        const gridInteractionModeSelect = document.getElementById('gridInteractionMode');
+
+        // Compare Mode Elements
+        const compareAlgoSelect1 = document.getElementById('compareAlgoSelect1');
+        const compareAlgoSelect2 = document.getElementById('compareAlgoSelect2');
+        const compareStartNodeSelect = document.getElementById('compareStartNode');
+        const compareTargetNodeSelect = document.getElementById('compareTargetNode');
+        const compareTargetNodeGroup = document.getElementById('compareTargetNodeGroup');
+        const runComparisonButton = document.getElementById('runComparisonButton');
+        const resetComparisonButton = document.getElementById('resetComparisonButton');
+        const compareSpeedSlider = document.getElementById('compareSpeedSlider');
+        const compareSpeedValueSpan = document.getElementById('compareSpeedValue');
+        const compareCanvas1 = document.getElementById('compareCanvas1');
+        const compareCtx1 = compareCanvas1.getContext('2d');
+        const compareCanvas2 = document.getElementById('compareCanvas2');
+        const compareCtx2 = compareCanvas2.getContext('2d');
+        const compareCanvasTitle1 = document.getElementById('compareCanvasTitle1');
+        const compareCanvasTitle2 = document.getElementById('compareCanvasTitle2');
+        const compareResultsDiv = document.getElementById('compareResults');
+        const compareResult1Div = document.getElementById('compareResult1');
+        const compareResult2Div = document.getElementById('compareResult2');
+
+        // LLM Explanation Elements
+        const explainAlgoButton = document.getElementById('explainAlgoButton');
+        const llmExplanationBox = document.getElementById('llmExplanationBox');
+        const llmExplanationContent = document.getElementById('llmExplanationContent');
+        const llmLoadingIndicator = document.getElementById('llmLoadingIndicator');
+
+        // Chatbot Elements (now part of the popup)
+        const chatFab = document.getElementById('chatFab');
+        const chatPopup = document.getElementById('chatPopup');
+        const closeChatButton = document.getElementById('closeChatButton');
+        const chatMessagesDiv = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendChatButton = document.getElementById('sendChatButton');
+        const clearChatButton = document.getElementById('clearChatButton');
+        const chatLoadingIndicator = document.getElementById('chatLoadingIndicator');
+        let chatHistory = []; // Stores chat messages for context
+
+
+        // Graph definition (nodes and edges) - NOW DYNAMICALLY MODIFIABLE
+        let graph = {
+            'A': [{ node: 'B', weight: 4 }, { node: 'C', weight: 2 }],
+            'B': [{ node: 'A', weight: 4 }, { node: 'D', weight: 5 }, { node: 'E', weight: 10 }],
+            'C': [{ node: 'A', weight: 2 }, { node: 'F', weight: 3 }],
+            'D': [{ node: 'B', weight: 5 }],
+            'E': [{ node: 'B', weight: 10 }, { node: 'F', weight: 1 }],
+            'F': [{ node: 'C', weight: 3 }, { node: 'E', weight: 1 }, { node: 'G', weight: 8 }],
+            'G': [{ node: 'F', weight: 8 }]
+        };
+
+        // Node positions for drawing (fixed for now for a clear layout) - NOW DYNAMICALLY MODIFIABLE
+        let nodePositions = {
+            'A': { x: 150, y: 100 },
+            'B': { x: 300, y: 50 },
+            'C': { x: 300, y: 150 },
+            'D': { x: 450, y: 50 },
+            'E': { x: 450, y: 250 },
+            'F': { x: 600, y: 150 },
+            'G': { x: 750, y: 150 }
+        };
+
+        // Reference dimensions for the initial nodePositions layout
+        const REFERENCE_CANVAS_WIDTH = 900;
+        const REFERENCE_CANVAS_HEIGHT = 500;
+
+        const nodeRadius = 25;
+        let nodesArray = Object.keys(graph); // Array of node names for matrix indexing
+        let numNodes = nodesArray.length;
+        let nextNodeId = 'H'; // For adding new nodes, start from 'H'
+
+        // State variables for graph algorithm visualization
+        let visitedNodes = new Set();
+        let queueNodes = []; // For BFS
+        let stackNodes = []; // For DFS
+        let currentNode = null;
+        let visitedOrder = []; // To store the order of visited nodes
+        
+        // Dijkstra specific state
+        let distances = {}; // Stores shortest distance from source
+        let previousNodes = {}; // Stores predecessor for path reconstruction
+        let finalizedNodes = new Set(); // Nodes whose shortest path is found
+        let pathNodes = []; // Nodes in the final shortest path
+
+        // Floyd-Warshall specific state
+        let floydDistMatrix = []; // Current distance matrix for visualization
+        let floydPathMatrix = []; // Path reconstruction matrix (optional for visualization)
+        let currentK = -1, currentI = -1, currentJ = -1; // Indices for highlighting in matrix
+        let currentFloydPath = []; // For visualizing a specific path after FW
+
+        // Graph Interaction State
+        let currentGraphInteractionMode = 'select'; // 'select', 'add-node', 'remove-node', 'add-edge', 'remove-edge'
+        let draggedNode = null; // Node currently being dragged
+        let startEdgeNode = null; // First node clicked when adding an edge
+        let mouseX = 0, mouseY = 0; // Current mouse position for drawing temporary edge
+
+        // Grid Interaction State
+        let currentGridInteractionMode = 'none'; // 'none', 'set-start', 'set-end', 'add-wall', 'remove-wall'
+
+
+        // --- Custom Modal Function ---
+        function showModal(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            customModal.style.display = 'flex'; // Show the modal
+        }
+
+        modalCloseButton.addEventListener('click', () => {
+            customModal.style.display = 'none'; // Hide the modal
+        });
+
+        // --- Core Functions for UI and State Management ---
+
+        // Function to update the UI based on current mode and algorithm
+        function updateUI() {
+            // Hide all main containers first
+            graphContainer.classList.add('hidden');
+            gridContainer.classList.add('hidden');
+            compareContainer.classList.add('hidden');
+            
+            // Show/hide algorithm select in nav based on mode
+            algorithmSelect.style.display = (currentMode === 'graph') ? 'block' : 'none';
+            algorithmSelect.disabled = false; // Always enable algorithm select in nav, unless comparison is running
+
+            // Show/hide containers based on mode
+            if (currentMode === 'graph') {
+                graphContainer.classList.remove('hidden');
+                
+                // Show/hide graph-specific controls
+                document.querySelector('#graphContainer .controls').classList.remove('hidden');
+                document.getElementById('graphInteractionModeGroup').style.display = 'flex'; // Always show interaction mode
+
+                // Show/hide algorithm-specific dropdowns
+                if (currentAlgorithm === 'dijkstra') {
+                    startNodeGroup.style.display = 'flex';
+                    targetNodeGroup.style.display = 'flex';
+                    floydPathSelectionGroup.style.display = 'none'; // Hide Floyd-Warshall path selection
+                } else if (currentAlgorithm === 'bfs' || currentAlgorithm === 'dfs' || currentAlgorithm === 'mst') {
+                    startNodeGroup.style.display = 'flex';
+                    targetNodeGroup.style.display = 'none';
+                    floydPathSelectionGroup.style.display = 'none'; // Hide Floyd-Warshall path selection
+                } else if (currentAlgorithm === 'floyd-warshall') {
+                    startNodeGroup.style.display = 'none';
+                    targetNodeGroup.style.display = 'none';
+                    floydPathSelectionGroup.style.display = 'flex'; // Show Floyd-Warshall path selection
+                } else { // Default or other algorithms
+                    startNodeGroup.style.display = 'none';
+                    targetNodeGroup.style.display = 'none';
+                    floydPathSelectionGroup.style.display = 'none';
+                }
+
+                if (currentAlgorithm === 'floyd-warshall') {
+                    matrixContainer.classList.remove('hidden');
+                } else {
+                    matrixContainer.classList.add('hidden');
+                }
+
+                // Show/hide edge weight input based on interaction mode
+                if (currentGraphInteractionMode === 'add-edge') {
+                    newEdgeWeightGroup.style.display = 'flex';
+                } else {
+                    newEdgeWeightGroup.style.display = 'none';
+                }
+
+                // Disable algorithm-specific controls if in an interaction mode other than 'select'
+                const algorithmControlsDisabled = currentGraphInteractionMode !== 'select';
+                startButton.disabled = algorithmControlsDisabled;
+                resetButton.disabled = algorithmControlsDisabled;
+                speedSlider.disabled = algorithmControlsDisabled;
+                startNodeSelect.disabled = algorithmControlsDisabled;
+                targetNodeSelect.disabled = algorithmControlsDisabled;
+                // algorithmSelect.disabled is handled outside this block for nav
+                showFloydPathButton.disabled = algorithmControlsDisabled || floydWarshallResult.finalMatrix.length === 0;
+                explainAlgoButton.disabled = algorithmControlsDisabled; // Disable LLM button during interaction
+
+                llmExplanationBox.classList.add('hidden'); // Hide LLM explanation when algorithm changes or mode changes
+                llmExplanationContent.innerHTML = ''; // Clear content
+            } else if (currentMode === 'grid') {
+                gridContainer.classList.remove('hidden');
+                
+                // Show/hide grid-specific controls
+                document.querySelector('#gridContainer .grid-controls').classList.remove('hidden');
+                // Disable grid algorithm button if in an interaction mode other than 'none'
+                const gridAlgorithmControlsDisabled = currentGridInteractionMode !== 'none';
+                runGridAlgorithmButton.disabled = gridAlgorithmControlsDisabled;
+                clearGridButton.disabled = gridAlgorithmControlsDisabled;
+                gridSpeedSlider.disabled = gridAlgorithmControlsDisabled;
+                gridInteractionModeSelect.disabled = false; // Interaction mode is always available
+            } else if (currentMode === 'compare') {
+                compareContainer.classList.remove('hidden');
+                // Logic for compare mode specific controls visibility
+                const algo1 = compareAlgoSelect1.value;
+                const algo2 = compareAlgoSelect2.value;
+
+                // Show/hide target node for Dijkstra in compare mode
+                if (algo1 === 'dijkstra' || algo2 === 'dijkstra') {
+                    compareTargetNodeGroup.style.display = 'flex';
+                } else {
+                    compareTargetNodeGroup.style.display = 'none';
+                }
+                // Disable other controls while comparison is running
+                runComparisonButton.disabled = isAlgorithmRunning;
+                resetComparisonButton.disabled = isAlgorithmRunning;
+                compareAlgoSelect1.disabled = isAlgorithmRunning;
+                compareAlgoSelect2.disabled = isAlgorithmRunning;
+                compareStartNodeSelect.disabled = isAlgorithmRunning;
+                compareTargetNodeSelect.disabled = isAlgorithmRunning;
+                compareSpeedSlider.disabled = isAlgorithmRunning;
+            }
+            // The chat mode in the select is now just a label, the actual chat is a popup
+            
+            // Update algorithm title and info box based on mode
+            if (currentMode === 'graph') {
+                switch (currentAlgorithm) {
+                    case 'bfs':
+                        graphAlgorithmTitle.textContent = 'Breadth-First Search (BFS)';
+                        updateGraphInfoContent('bfs');
+                        updateEditorContent('bfs');
+                        break;
+                    case 'dfs':
+                        graphAlgorithmTitle.textContent = 'Depth-First Search (DFS)';
+                        updateGraphInfoContent('dfs');
+                        updateEditorContent('dfs');
+                        break;
+                    case 'dijkstra':
+                        graphAlgorithmTitle.textContent = 'Dijkstra\'s Algorithm';
+                        updateGraphInfoContent('dijkstra');
+                        updateEditorContent('dijkstra');
+                        break;
+                    case 'floyd-warshall':
+                        graphAlgorithmTitle.textContent = 'Floyd-Warshall Algorithm';
+                        updateGraphInfoContent('floyd-warshall');
+                        updateEditorContent('floyd-warshall');
+                        break;
+                    case 'mst':
+                        graphAlgorithmTitle.textContent = 'Minimum Spanning Tree (Prim\'s Algorithm)';
+                        updateGraphInfoContent('mst');
+                        updateEditorContent('mst');
+                        break;
+                }
+            } else if (currentMode === 'grid') {
+                gridAlgorithmTitle.textContent = 'Grid Pathfinding (BFS)';
+                gridAlgorithmInfoBox.innerHTML = `
+                    <h3>Grid Pathfinding - Breadth-First Search (BFS)</h3>
+                    <p>
+                        This algorithm finds the shortest path between a start and an end point on a grid, avoiding walls.
+                    </p>
+                    <p>
+                        You can define start/end points, add walls, and watch the algorithms find paths or generate mazes.
+                    </p>
+                    <p class="text-sm text-gray-300">Use the language dropdown above to view code samples in the embedded editor.</p>
+                `;
+            } else if (currentMode === 'compare') {
+                compareCanvasTitle1.textContent = getAlgorithmName(compareAlgoSelect1.value);
+                compareCanvasTitle2.textContent = getAlgorithmName(compareAlgoSelect2.value);
+                compareResultsDiv.classList.add('hidden'); // Hide results until comparison runs
+            }
+            resetVisualization(); // Reset visualization when mode or algorithm changes
+        }
+
+        // Helper function to get full algorithm name
+        function getAlgorithmName(algoValue) {
+            switch(algoValue) {
+                case 'bfs': return 'Breadth-First Search (BFS)';
+                case 'dfs': return 'Depth-First Search (DFS)';
+                case 'dijkstra': return 'Dijkstra\'s Algorithm';
+                case 'floyd-warshall': return 'Floyd-Warshall Algorithm';
+                case 'mst': return 'Minimum Spanning Tree (Prim\'s)';
+                default: return 'Unknown Algorithm';
+            }
+        }
+
+        // Function to populate the start and target node dropdowns for graph algorithms
+        function populateNodeSelects() {
+            startNodeSelect.innerHTML = ''; // Clear existing options
+            targetNodeSelect.innerHTML = '';
+            compareStartNodeSelect.innerHTML = '';
+            compareTargetNodeSelect.innerHTML = '';
+            floydPathStartNodeSelect.innerHTML = '';
+            floydPathEndNodeSelect.innerHTML = '';
+
+            nodesArray = Object.keys(graph); // Update nodesArray
+            numNodes = nodesArray.length; // Update numNodes
+
+            nodesArray.forEach(node => {
+                const optionStart = document.createElement('option');
+                optionStart.value = node;
+                optionStart.textContent = node;
+                startNodeSelect.appendChild(optionStart);
+
+                const optionTarget = document.createElement('option');
+                optionTarget.value = node;
+                optionTarget.textContent = node;
+                targetNodeSelect.appendChild(optionTarget);
+
+                const optionCompareStart = document.createElement('option');
+                optionCompareStart.value = node;
+                optionCompareStart.textContent = node;
+                compareStartNodeSelect.appendChild(optionCompareStart);
+
+                const optionCompareTarget = document.createElement('option');
+                optionCompareTarget.value = node;
+                optionCompareTarget.textContent = node;
+                compareTargetNodeSelect.appendChild(optionCompareTarget);
+
+                const optionFloydPathStart = document.createElement('option');
+                optionFloydPathStart.value = node;
+                optionFloydPathStart.textContent = node;
+                floydPathStartNodeSelect.appendChild(optionFloydPathStart);
+
+                const optionFloydPathEnd = document.createElement('option');
+                optionFloydPathEnd.value = node;
+                optionFloydPathEnd.textContent = node;
+                floydPathEndNodeSelect.appendChild(optionFloydPathEnd);
+            });
+            // Set default selected nodes
+            if (nodesArray.length > 0) {
+                startNodeSelect.value = nodesArray[0];
+                targetNodeSelect.value = nodesArray[nodesArray.length - 1]; // Default target to last node
+                compareStartNodeSelect.value = nodesArray[0];
+                compareTargetNodeSelect.value = nodesArray[nodesArray.length - 1];
+                floydPathStartNodeSelect.value = nodesArray[0];
+                floydPathEndNodeSelect.value = nodesArray[nodesArray.length - 1];
+            } else {
+                startNodeSelect.value = '';
+                targetNodeSelect.value = '';
+                compareStartNodeSelect.value = '';
+                compareTargetNodeSelect.value = '';
+                floydPathStartNodeSelect.value = '';
+                floydPathEndNodeSelect.value = '';
+            }
+        }
+
+        // --- Graph Visualization Functions ---
+
+        // Function to draw the graph on a given canvas context
+        function drawGraph(context, graphData, nodePositionsData, {
+            visited = new Set(),
+            queue = [],
+            stack = [],
+            current = null,
+            path = [], // This path is for Dijkstra or Floyd-Warshall path visualization
+            floydK = -1, floydI = -1, floydJ = -1,
+            mstEdges = new Set(),
+            dijkstraDistances = {},
+            highlightedNode = null,
+            startEdgeNode = null,
+            mouseX = 0, mouseY = 0,
+            interactionMode = 'select' // To draw temporary edge
+        }) {
+            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+            // Calculate scaling factors based on the current canvas dimensions relative to the reference dimensions
+            const scaleX = context.canvas.width / REFERENCE_CANVAS_WIDTH;
+            const scaleY = context.canvas.height / REFERENCE_CANVAS_HEIGHT;
+            const overallScale = Math.min(scaleX, scaleY); // Use min to ensure content fits within both dimensions
+
+            const effectiveNodeRadius = nodeRadius * overallScale;
+            context.lineWidth = 2 * overallScale; // Scale line width
+            context.font = `${14 * overallScale}px Inter`; // Scale font size
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+
+            // Draw edges first
+            for (const nodeName in graphData) {
+                const startPos = nodePositionsData[nodeName];
+                if (startPos) {
+                    const scaledStartX = startPos.x * scaleX;
+                    const scaledStartY = startPos.y * scaleY;
+                    for (const edge of graphData[nodeName]) {
+                        const neighbor = edge.node;
+                        const weight = edge.weight;
+                        const endPos = nodePositionsData[neighbor];
+                        if (endPos) {
+                            const scaledEndX = endPos.x * scaleX;
+                            const scaledEndY = endPos.y * scaleY;
+
+                            // Determine edge color (same logic)
+                            context.strokeStyle = '#94a3b8';
+                            const edgeKey1 = `${nodeName}-${neighbor}`;
+                            const edgeKey2 = `${neighbor}-${nodeName}`;
+                            const isPathEdge = (path.includes(nodeName) && path.includes(neighbor) &&
+                                (path.indexOf(nodeName) === path.indexOf(neighbor) - 1 || path.indexOf(neighbor) === path.indexOf(nodeName) - 1));
+                            if (isPathEdge) {
+                                context.strokeStyle = '#059669';
+                            } else if (mstEdges.has(edgeKey1) || mstEdges.has(edgeKey2)) {
+                                context.strokeStyle = '#059669';
+                            }
+
+                            context.beginPath();
+                            context.moveTo(scaledStartX, scaledStartY);
+                            context.lineTo(scaledEndX, scaledEndY);
+                            context.stroke();
+
+                            // Draw weight
+                            const midX = (scaledStartX + scaledEndX) / 2;
+                            const midY = (scaledStartY + scaledEndY) / 2;
+                            const angle = Math.atan2(scaledEndY - scaledStartY, scaledEndX - scaledStartX);
+                            const offsetX = 15 * Math.sin(angle) * overallScale; // Scale offset
+                            const offsetY = 15 * -Math.cos(angle) * overallScale; // Scale offset
+
+                            context.fillStyle = '#1e293b';
+                            context.fillText(weight, midX + offsetX, midY + offsetY);
+                        }
+                    }
+                }
+            }
+
+            // Draw temporary edge line if adding edge in interaction mode
+            // MouseX and mouseY are already relative to the current canvas, so they don't need scaling here.
+            if (interactionMode === 'add-edge' && startEdgeNode) {
+                const startPos = nodePositionsData[startEdgeNode];
+                if (startPos) {
+                    const scaledStartX = startPos.x * scaleX;
+                    const scaledStartY = startPos.y * scaleY;
+                    context.strokeStyle = '#f59e0b';
+                    context.lineWidth = 2 * overallScale;
+                    context.beginPath();
+                    context.moveTo(scaledStartX, scaledStartY);
+                    context.lineTo(mouseX, mouseY); // Mouse coordinates are already relative to the current canvas
+                    context.stroke();
+                }
+            }
+
+
+            // Draw nodes and labels
+            for (const node of Object.keys(graphData)) {
+                const pos = nodePositionsData[node];
+                const scaledX = pos.x * scaleX;
+                const scaledY = pos.y * scaleY;
+
+                let fillColor = '#60a5fa';
+                // ... (color logic remains the same) ...
+                if (visited.has(node)) {
+                    fillColor = '#10b981'; // Green-500 for visited
+                }
+                if (queue.includes(node)) {
+                    fillColor = '#f59e0b'; // Amber-500 for in BFS queue
+                }
+                if (stack.includes(node)) {
+                    fillColor = '#8b5cf6'; // Purple-500 for in DFS stack
+                }
+                if (current === node) {
+                    fillColor = '#ef4444'; // Red for current processing
+                }
+                if (highlightedNode === node) { // For dragging or startEdgeNode
+                    fillColor = '#6366f1'; // Indigo for highlighted interaction node
+                }
+                if (startEdgeNode === node) { // Specific highlight for start of edge
+                    fillColor = '#f59e0b';
+                }
+                // Highlight nodes in the path for Dijkstra or Floyd-Warshall
+                if (path.includes(node)) {
+                    fillColor = '#059669'; // Green for path nodes
+                }
+
+                context.beginPath();
+                context.arc(scaledX, scaledY, effectiveNodeRadius, 0, Math.PI * 2);
+                context.fillStyle = fillColor;
+                context.fill();
+                context.strokeStyle = '#334155';
+                context.lineWidth = 2 * overallScale; // Scale border width
+                context.stroke();
+
+                // Node label
+                context.fillStyle = '#ffffff';
+                context.font = `bold ${18 * overallScale}px Inter`; // Scale font size
+                context.fillText(node, scaledX, scaledY);
+
+                // Display distance for Dijkstra
+                if (dijkstraDistances[node] !== undefined && dijkstraDistances[node] !== Infinity) {
+                    context.fillStyle = '#1e293b';
+                    context.font = `${12 * overallScale}px Inter`; // Scale font size
+                    context.fillText(dijkstraDistances[node], scaledX, scaledY + effectiveNodeRadius + (10 * overallScale)); // Scale offset
+                }
+            }
+        }
+
+        // --- Matrix Visualization Functions (for Floyd-Warshall) ---
+        function drawMatrix(context, matrix, nodesArr, highlightI = -1, highlightJ = -1, updatedI = -1, updatedJ = -1) {
+            let tableHTML = '<table class="matrix-table"><thead><tr><th></th>';
+            nodesArr.forEach(node => {
+                tableHTML += `<th>${node}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+
+            for (let i = 0; i < nodesArr.length; i++) {
+                tableHTML += `<tr><th>${nodesArr[i]}</th>`;
+                for (let j = 0; j < nodesArr.length; j++) {
+                    let cellValue = matrix[i][j] === Infinity || matrix[i][j] === 1_000_000 ? '∞' : matrix[i][j];
+                    let cellClass = '';
+                    if (i === highlightI && j === highlightJ) {
+                        cellClass = 'highlight-cell'; // Currently being considered
+                    }
+                    if (i === updatedI && j === updatedJ) {
+                        cellClass = 'updated-cell'; // Value just updated
+                    }
+                    tableHTML += `<td class="${cellClass}">${cellValue}</td>`;
+                }
+                tableHTML += '</tr>';
+            }
+            tableHTML += '</tbody></table>';
+            distanceMatrixTableDiv.innerHTML = tableHTML; // Always draw to the main matrix div
+        }
+
+        // --- Grid Visualization Functions ---
+        function initializeGrid(context, initial = true) {
+            if (initial) { // Only reset full grid on initial load or explicit clear
+                grid = Array(GRID_ROWS).fill(0).map(() => Array(GRID_COLS).fill(0)); // 0 for empty
+                gridWalls = new Set();
+                startGridNode = null;
+                endGridNode = null;
+            }
+            gridVisited = new Set(); // Always clear visited/path on reset
+            gridPath = [];
+            
+            cellSize = Math.min(context.canvas.width / GRID_COLS, context.canvas.height / GRID_ROWS);
+            drawGrid(context, gridWalls, gridVisited, gridPath, startGridNode, endGridNode, cellSize);
+        }
+
+        function drawGrid(context, walls, visitedCells, pathCells, startNode, endNode, currentCellSize) {
+            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+            for (let r = 0; r < GRID_ROWS; r++) {
+                for (let c = 0; c < GRID_COLS; c++) {
+                    const x = c * currentCellSize;
+                    const y = r * currentCellSize;
+                    const cellKey = `${r}-${c}`;
+
+                    context.strokeStyle = '#cbd5e1'; // Light gray for grid lines
+                    context.strokeRect(x, y, currentCellSize, currentCellSize);
+
+                    // Determine fill color based on cell state
+                    let fillColor = '#ffffff'; // Default empty
+                    if (walls.has(cellKey)) {
+                        fillColor = '#4a5568'; // Dark gray for walls
+                    } else if (pathCells.includes(cellKey)) {
+                        fillColor = '#6366f1'; // Indigo for path
+                    } else if (visitedCells.has(cellKey)) {
+                        fillColor = '#93c5fd'; // Light blue for visited
+                    }
+
+                    context.fillStyle = fillColor;
+                    context.fillRect(x + 1, y + 1, currentCellSize - 2, currentCellSize - 2); // Fill with slight padding
+
+                    // Draw start/end nodes on top
+                    if (startNode && startNode.row === r && startNode.col === c) {
+                        context.fillStyle = '#10b981'; // Green for start
+                        context.fillRect(x + 1, y + 1, currentCellSize - 2, currentCellSize - 2);
+                        context.fillStyle = '#ffffff';
+                        context.font = 'bold 16px Inter';
+                        context.textAlign = 'center';
+                        context.textBaseline = 'middle';
+                        context.fillText('S', x + currentCellSize / 2, y + currentCellSize / 2);
+                    }
+                    if (endNode && endNode.row === r && endNode.col === c) {
+                        context.fillStyle = '#ef4444'; // Red for end
+                        context.fillRect(x + 1, y + 1, currentCellSize - 2, currentCellSize - 2);
+                        context.fillStyle = '#ffffff';
+                        context.font = 'bold 16px Inter';
+                        context.textAlign = 'center';
+                        context.textBaseline = 'middle';
+                        context.fillText('E', x + currentCellSize / 2, y + currentCellSize / 2);
+                    }
+                }
+            }
+        }
+
+        // --- Grid Customization Functions ---
+
+        // Helper to get grid cell from mouse coordinates
+        function getGridCell(x, y, currentCellSize) {
+            const row = Math.floor(y / currentCellSize);
+            const col = Math.floor(x / currentCellSize);
+            if (row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS) {
+                return { row, col, key: `${row}-${col}` };
+            }
+            return null;
+        }
+
+        // Set start, end, or wall node on the grid
+        function setGridNodeState(cell, type) {
+            if (!cell) return;
+            // console.log(`Attempting to set ${type} at ${cell.key}`);
+            // console.log(`Before: startGridNode=${startGridNode?.key}, endGridNode=${endGridNode?.key}`);
+
+            // Clear existing start/end if setting new ones
+            if (type === 'set-start') {
+                if (startGridNode) {
+                    // console.log(`Clearing old start node from walls: ${startGridNode.key}`);
+                    gridWalls.delete(startGridNode.key);
+                }
+                startGridNode = cell;
+                gridWalls.delete(cell.key); // A start node cannot be a wall
+                if (endGridNode && endGridNode.key === cell.key) {
+                    // console.log(`End node was at new start location, clearing end: ${endGridNode.key}`);
+                    endGridNode = null; // If setting start on end
+                }
+                showModal("Start Node Set", `Start node placed at (${cell.row}, ${cell.col}).`);
+            } else if (type === 'set-end') {
+                if (endGridNode) {
+                    // console.log(`Clearing old end node from walls: ${endGridNode.key}`);
+                    gridWalls.delete(endGridNode.key);
+                }
+                endGridNode = cell;
+                gridWalls.delete(cell.key); // An end node cannot be a wall
+                if (startGridNode && startGridNode.key === cell.key) {
+                    // console.log(`Start node was at new end location, clearing start: ${startGridNode.key}`);
+                    startGridNode = null; // If setting end on start
+                }
+                showModal("End Node Set", `End node placed at (${cell.row}, ${cell.col}).`);
+            } else if (type === 'add-wall') {
+                if ((startGridNode && startGridNode.key === cell.key) || (endGridNode && endGridNode.key === cell.key)) {
+                    showModal("Error", "Cannot place a wall on start or end node.");
+                    // console.log("Attempted to place wall on start/end.");
+                    return;
+                }
+                gridWalls.add(cell.key);
+            } else if (type === 'remove-wall') {
+                gridWalls.delete(cell.key);
+            }
+            // console.log(`After: startGridNode=${startGridNode?.key}, endGridNode=${endGridNode?.key}`);
+            drawGrid(gridCtx, gridWalls, gridVisited, gridPath, startGridNode, endGridNode, cellSize);
+        }
+
+        // --- Graph Customization Functions ---
+
+        // Helper to find node under mouse
+        function getNodeAt(x, y, nodePositionsData) {
+            // Get current canvas scaling
+            const currentCanvas = document.getElementById('visualizationCanvas'); // Assuming this is for the main canvas
+            const scaleX = currentCanvas.width / REFERENCE_CANVAS_WIDTH;
+            const scaleY = currentCanvas.height / REFERENCE_CANVAS_HEIGHT;
+            const effectiveNodeRadius = nodeRadius * Math.min(scaleX, scaleY);
+
+            for (const nodeName in nodePositionsData) {
+                const pos = nodePositionsData[nodeName];
+                const scaledX = pos.x * scaleX;
+                const scaledY = pos.y * scaleY;
+                const dist = Math.sqrt(Math.pow(x - scaledX, 2) + Math.pow(y - scaledY, 2));
+                if (dist < effectiveNodeRadius) {
+                    return nodeName;
+                }
+            }
+            return null;
+        }
+
+        // Add a new node
+        function addNode(x, y) {
+            // When adding a node, store its position in the ORIGINAL scale
+            const currentCanvas = document.getElementById('visualizationCanvas');
+            const scaleX = currentCanvas.width / REFERENCE_CANVAS_WIDTH;
+            const scaleY = currentCanvas.height / REFERENCE_CANVAS_HEIGHT;
+
+            const originalX = x / scaleX;
+            const originalY = y / scaleY;
+
+            let newNodeName = nextNodeId;
+            while (graph[newNodeName]) { // Ensure unique ID
+                newNodeName = String.fromCharCode(newNodeName.charCodeAt(0) + 1);
+                if (newNodeName.charCodeAt(0) > 'Z'.charCodeAt(0)) {
+                    showModal("Error", "Too many nodes! Cannot add more.");
+                    return;
+                }
+            }
+            graph[newNodeName] = [];
+            nodePositions[newNodeName] = { x: originalX, y: originalY }; // Store unscaled position
+            nextNodeId = String.fromCharCode(newNodeName.charCodeAt(0) + 1); // Increment for next new node
+            populateNodeSelects(); // Update dropdowns
+            drawGraph(ctx, graph, nodePositions, { interactionMode: currentGraphInteractionMode, startEdgeNode, mouseX, mouseY, path: currentFloydPath });
+            showModal("Node Added", `Node '${newNodeName}' added at (${Math.round(originalX)}, ${Math.round(originalY)}).`);
+        }
+
+        // Remove a node
+        function removeNode(nodeName) {
+            if (!graph[nodeName]) return;
+
+            // Remove node from graph
+            delete graph[nodeName];
+            delete nodePositions[nodeName];
+
+            // Remove all edges connected to this node
+            for (const otherNode in graph) {
+                graph[otherNode] = graph[otherNode].filter(edge => edge.node !== nodeName);
+            }
+            populateNodeSelects(); // Update dropdowns
+            drawGraph(ctx, graph, nodePositions, { interactionMode: currentGraphInteractionMode, startEdgeNode, mouseX, mouseY, path: currentFloydPath });
+            showModal("Node Removed", `Node '${nodeName}' and its edges removed.`);
+        }
+
+        // Add an edge
+        function addEdge(node1, node2, weight) {
+            if (node1 === node2) {
+                showModal("Error", "Cannot add an edge to the same node.");
+                return;
+            }
+            if (!graph[node1] || !graph[node2]) {
+                showModal("Error", "One or both nodes do not exist.");
+                return;
+            }
+
+            // Check if edge already exists (bidirectional check for simplicity)
+            const existingEdge1 = graph[node1].some(edge => edge.node === node2);
+            const existingEdge2 = graph[node2].some(edge => edge.node === node1);
+
+            if (existingEdge1 || existingEdge2) {
+                showModal("Error", `Edge already exists between ${node1} and ${node2}.`);
+                return;
+            }
+
+            const parsedWeight = parseInt(weight);
+            if (isNaN(parsedWeight) || parsedWeight <= 0) {
+                showModal("Invalid Weight", "Please enter a positive number for edge weight.");
+                return;
+            }
+
+            graph[node1].push({ node: node2, weight: parsedWeight });
+            graph[node2].push({ node: node1, weight: parsedWeight }); // Assuming undirected for now
+            drawGraph(ctx, graph, nodePositions, { interactionMode: currentGraphInteractionMode, startEdgeNode, mouseX, mouseY, path: currentFloydPath });
+            showModal("Edge Added", `Edge added between ${node1} and ${node2} with weight ${parsedWeight}.`);
+        }
+
+        // Remove an edge
+        function removeEdge(node1, node2) {
+            if (!graph[node1] || !graph[node2]) {
+                showModal("Error", "One or both nodes do not exist.");
+                return;
+            }
+
+            const initialLength1 = graph[node1].length;
+            const initialLength2 = graph[node2].length;
+
+            graph[node1] = graph[node1].filter(edge => edge.node !== node2);
+            graph[node2] = graph[node2].filter(edge => edge.node !== node1); // Assuming undirected for now
+
+            if (graph[node1].length < initialLength1 || graph[node2].length < initialLength2) {
+                drawGraph(ctx, graph, nodePositions, { interactionMode: currentGraphInteractionMode, startEdgeNode, mouseX, mouseY, path: currentFloydPath });
+                showModal("Edge Removed", `Edge removed between ${node1} and ${node2}.`);
+            } else {
+                showModal("Error", `No edge found between ${node1} and ${node2}.`);
+            }
+        }
+
+
+        // --- Backend API Call & Visualization Logic (replaces local algorithm functions) ---
+
+        // Function to animate steps received from the backend
+        async function animateSteps(context, steps) {
+            isAlgorithmRunning = true;
+            startButton.disabled = true;
+            resetButton.disabled = true;
+            modeSelect.disabled = true;
+            algorithmSelect.disabled = true;
+            graphInteractionModeSelect.disabled = true;
+            let lastStep = null;
+
+    for (let i = 0; i < steps.length; i++) {
+        const step = steps[i];
+        lastStep = step;
+
+        // For graph algorithms
+        if (step.currentNode !== undefined) {
+            const visitedSet = step.visitedNodes ? new Set(step.visitedNodes) : new Set();
+            const queueOrStack = step.queueOrStack || [];
+            const distances = step.distances || {};
+            const path = step.path || [];
+            const mstEdges = step.mstEdges ? new Set(step.mstEdges) : new Set();
+            const current = step.currentNode;
+
+            drawGraph(context, graph, nodePositions, {
+                visited: visitedSet,
+                queue: currentAlgorithm === 'bfs' ? queueOrStack : [],
+                stack: currentAlgorithm === 'dfs' ? queueOrStack : [],
+                dijkstraDistances: currentAlgorithm === 'dijkstra' ? distances : {},
+                path: currentAlgorithm === 'dijkstra' ? path : [],
+                mstEdges: currentAlgorithm === 'mst' ? mstEdges : new Set(),
+                current: current
+            });
+        }
+        
+        // For Floyd-Warshall (Matrix)
+        if (step.distanceMatrix) {
+            const nodesArr = Object.keys(graph).sort();
+            drawMatrix(context, step.distanceMatrix, nodesArr, step.highlightI, step.highlightJ, step.highlightI, step.highlightJ);
+            drawGraph(context, graph, nodePositions, { highlightedNode: nodesArr[step.highlightI] });
+        }
+
+        await new Promise(resolve => setTimeout(resolve, animationSpeed));
+    }
+    
+    // Final redraw to clean up any remaining highlighting
+    const finalStep = steps[steps.length - 1];
+
+    if (currentAlgorithm === 'floyd-warshall') {
+        floydWarshallResult.finalMatrix = finalStep.distanceMatrix;
+        floydWarshallResult.pathMatrix = finalStep.pathMatrix; 
+        const nodesArr = Object.keys(graph).sort();
+        drawGraph(context, graph, nodePositions, {});
+        drawMatrix(context, finalStep.distanceMatrix, nodesArr);
+        showFloydPathButton.disabled = false;
+        showModal("Floyd-Warshall Complete!", "All-pairs shortest paths calculated. You can now select start/end nodes to visualize a specific path.");
+    } else if (currentAlgorithm === 'dijkstra' && finalStep.path) {
+        const selectedStartNode = startNodeSelect.value;
+        const selectedTargetNode = targetNodeSelect.value;
+        const path = finalStep.path.join(' -> ');
+        const distance = finalStep.distances[selectedTargetNode];
+        showModal("Dijkstra's Algorithm Complete!", `Shortest path from ${selectedStartNode} to ${selectedTargetNode}: ${path} (Total Distance: ${distance})`);
+        drawGraph(context, graph, nodePositions, { path: finalStep.path });
+    } else if (currentAlgorithm === 'mst' && finalStep.mstEdges) {
+        const totalWeight = calculateMstWeight(finalStep.mstEdges, graph);
+        showModal("MST Complete!", `Minimum Spanning Tree (Prim's) Complete!\nTotal Weight: ${totalWeight}`);
+        drawGraph(context, graph, nodePositions, { mstEdges: new Set(finalStep.mstEdges) });
+    } else if (currentAlgorithm === 'bfs' || currentAlgorithm === 'dfs') {
+        // This is the new logic for BFS and DFS
+        const traversalOrder = finalStep.visitedNodes.join(' -> ');
+        showModal(`${currentAlgorithm.toUpperCase()} Complete!`, `Traversal Order: ${traversalOrder}`);
+        drawGraph(context, graph, nodePositions, {});
+    }
+    else {
+        drawGraph(context, graph, nodePositions, {});
+        showModal("Algorithm Complete!", "The traversal is complete.");
+    }
+
+    isAlgorithmRunning = false;
+    startButton.disabled = false;
+    resetButton.disabled = false;
+    modeSelect.disabled = false;
+    algorithmSelect.disabled = false;
+    graphInteractionModeSelect.disabled = false;
+    
+}
+        // Master function to run any graph algorithm
+        async function runGraphAlgorithm(algorithm, context) {
+            if (isAlgorithmRunning) return;
+            isAlgorithmRunning = true;
+            startButton.disabled = true;
+            resetButton.disabled = true;
+
+            const requestBody = {
+                graph: graph,
+                startNode: startNodeSelect.value,
+                targetNode: targetNodeSelect.value
+            };
+            
+            try {
+                const apiUrl = `${serverUrl}/api/algorithms/${algorithm}`;
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `Server responded with status: ${response.status}`);
+                }
+                
+                const steps = await response.json();
+                
+                if (steps.length > 0) {
+                    await animateSteps(context, steps);
+                } else {
+                     showModal("No Path Found", "The algorithm could not find any path or nodes to visit.");
+                }
+            } catch (error) {
+                showModal("Error", `Failed to run algorithm: ${error.message}`);
+                console.error("Algorithm run error:", error);
+            } finally {
+                isAlgorithmRunning = false;
+                startButton.disabled = false;
+                resetButton.disabled = false;
+            }
+        }
+
+        // --- Grid Pathfinding (BFS on Grid) ---
+        // This remains a front-end function for now as there is no backend endpoint for it.
+        async function gridBFS(context, currentGridWalls, currentStartGridNode, currentEndGridNode, currentCellSize, speed, { onComplete }) {
+            const localGridVisited = new Set();
+            const localGridPath = [];
+            const queue = [];
+            const parentMap = new Map(); // Stores {childKey: parentKey} for path reconstruction
+
+            queue.push(currentStartGridNode.key);
+            localGridVisited.add(currentStartGridNode.key);
+            drawGrid(context, currentGridWalls, localGridVisited, localGridPath, currentStartGridNode, currentEndGridNode, currentCellSize);
+            await new Promise(resolve => setTimeout(resolve, speed));
+
+            const directions = [
+                { dr: -1, dc: 0 }, // Up
+                { dr: 1, dc: 0 },  // Down
+                { dr: 0, dc: -1 }, // Left
+                { dr: 0, dc: 1 }   // Right
+            ];
+
+            let pathFound = false;
+            while (queue.length > 0) {
+                const currentKey = queue.shift();
+                const [r, c] = currentKey.split('-').map(Number);
+
+                // If end node reached
+                if (currentKey === currentEndGridNode.key) {
+                    pathFound = true;
+                    // Reconstruct path
+                    let pathCurrent = currentEndGridNode.key;
+                    while (pathCurrent && pathCurrent !== currentStartGridNode.key) {
+                        localGridPath.unshift(pathCurrent);
+                        pathCurrent = parentMap.get(pathCurrent);
+                    }
+                    if (currentStartGridNode) localGridPath.unshift(currentStartGridNode.key); // Add start node to path
+                    drawGrid(context, currentGridWalls, localGridVisited, localGridPath, currentStartGridNode, currentEndGridNode, currentCellSize);
+                    break;
+                }
+
+                // Explore neighbors
+                for (const dir of directions) {
+                    const newR = r + dir.dr;
+                    const newC = c + dir.dc;
+                    const neighborKey = `${newR}-${newC}`;
+
+                    // Check bounds, walls, and visited status
+                    if (newR >= 0 && newR < GRID_ROWS && newC >= 0 && newC < GRID_COLS &&
+                        !currentGridWalls.has(neighborKey) && !localGridVisited.has(neighborKey)) {
+                        
+                        localGridVisited.add(neighborKey);
+                        parentMap.set(neighborKey, currentKey);
+                        queue.push(neighborKey);
+                        drawGrid(context, currentGridWalls, localGridVisited, localGridPath, currentStartGridNode, currentEndGridNode, currentCellSize); // Update visualization
+                        await new Promise(resolve => setTimeout(resolve, speed));
+                    }
+                }
+            }
+            onComplete({ pathFound: pathFound, pathLength: pathFound ? (localGridPath.length - 1) : Infinity });
+        }
+
+
+        // --- Run Comparison Function ---
+        async function runComparison() {
+            if (isAlgorithmRunning) return;
+
+            const algo1 = compareAlgoSelect1.value;
+            const algo2 = compareAlgoSelect2.value;
+            const startNode = compareStartNodeSelect.value;
+            const targetNode = compareTargetNodeSelect.value;
+            const speed = parseInt(compareSpeedSlider.value);
+
+            if (!graph[startNode]) {
+                showModal("Error", "Start node does not exist in the graph.");
+                return;
+            }
+            if ((algo1 === 'dijkstra' || algo2 === 'dijkstra') && !graph[targetNode]) {
+                showModal("Error", "Target node does not exist in the graph for Dijkstra's algorithm.");
+                return;
+            }
+            if (algo1 === algo2) {
+                 showModal("Error", "Please select two different algorithms for comparison.");
+                return;
+            }
+
+            isAlgorithmRunning = true;
+            // Disable all comparison controls
+            runComparisonButton.disabled = true;
+            resetComparisonButton.disabled = true;
+            compareAlgoSelect1.disabled = true;
+            compareAlgoSelect2.disabled = true;
+            compareStartNodeSelect.disabled = true;
+            compareTargetNodeSelect.disabled = true;
+            compareSpeedSlider.disabled = true;
+            modeSelect.disabled = true; // Disable mode switching during comparison
+
+            // Clear previous results
+            compareResult1Div.innerHTML = '';
+            compareResult2Div.innerHTML = '';
+            compareResultsDiv.classList.add('hidden');
+
+            // --- Run Algorithm 1 ---
+            compareCanvasTitle1.textContent = getAlgorithmName(algo1);
+            let result1 = {};
+            const graphCopy1 = JSON.parse(JSON.stringify(graph));
+            const nodePositionsCopy1 = JSON.parse(JSON.stringify(nodePositions));
+            const nodesArrayCopy1 = Object.keys(graphCopy1).sort();
+
+            const requestBody1 = {
+                graph: graphCopy1,
+                startNode: startNode,
+                targetNode: targetNode
+            };
+
+            try {
+                const response1 = await fetch(`${serverUrl}/api/algorithms/${algo1}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody1)
+                });
+                const steps1 = await response1.json();
+                
+                await animateStepsForComparison(compareCtx1, graphCopy1, nodePositionsCopy1, steps1, speed);
+                const finalStep1 = steps1[steps1.length - 1];
+                
+                // Get result info from the final step
+                if (finalStep1.path) {
+                    result1 = { name: getAlgorithmName(algo1), pathLength: finalStep1.distances[targetNode], path: finalStep1.path.join(' -> ') };
+                } else if (finalStep1.mstEdges) {
+                     const totalWeight = calculateMstWeight(finalStep1.mstEdges, graphCopy1);
+                     result1 = { name: getAlgorithmName(algo1), totalWeight: totalWeight, edges: Array.from(finalStep1.mstEdges) };
+                } else if (finalStep1.distanceMatrix) {
+                    result1 = { name: getAlgorithmName(algo1), finalMatrix: finalStep1.distanceMatrix, nodes: nodesArrayCopy1 };
+                } else {
+                    result1 = { name: getAlgorithmName(algo1), visitedCount: finalStep1.visitedNodes.length };
+                }
+            } catch (error) {
+                console.error("Algorithm 1 failed:", error);
+                result1 = { name: getAlgorithmName(algo1), error: "Failed to run." };
+            }
+
+            // --- Run Algorithm 2 ---
+            compareCanvasTitle2.textContent = getAlgorithmName(algo2);
+            let result2 = {};
+            const graphCopy2 = JSON.parse(JSON.stringify(graph));
+            const nodePositionsCopy2 = JSON.parse(JSON.stringify(nodePositions));
+            const nodesArrayCopy2 = Object.keys(graphCopy2).sort();
+
+            const requestBody2 = {
+                graph: graphCopy2,
+                startNode: startNode,
+                targetNode: targetNode
+            };
+
+            try {
+                const response2 = await fetch(`${serverUrl}/api/algorithms/${algo2}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody2)
+                });
+                const steps2 = await response2.json();
+
+                await animateStepsForComparison(compareCtx2, graphCopy2, nodePositionsCopy2, steps2, speed);
+                const finalStep2 = steps2[steps2.length - 1];
+                
+                 if (finalStep2.path) {
+                    result2 = { name: getAlgorithmName(algo2), pathLength: finalStep2.distances[targetNode], path: finalStep2.path.join(' -> ') };
+                } else if (finalStep2.mstEdges) {
+                    const totalWeight = calculateMstWeight(finalStep2.mstEdges, graphCopy2);
+                    result2 = { name: getAlgorithmName(algo2), totalWeight: totalWeight, edges: Array.from(finalStep2.mstEdges) };
+                } else if (finalStep2.distanceMatrix) {
+                    result2 = { name: getAlgorithmName(algo2), finalMatrix: finalStep2.distanceMatrix, nodes: nodesArrayCopy2 };
+                } else {
+                    result2 = { name: getAlgorithmName(algo2), visitedCount: finalStep2.visitedNodes.length };
+                }
+
+            } catch (error) {
+                console.error("Algorithm 2 failed:", error);
+                result2 = { name: getAlgorithmName(algo2), error: "Failed to run." };
+            }
+            
+            // Display results
+            displayComparisonResults(result1, result2);
+
+            isAlgorithmRunning = false;
+            // Re-enable all comparison controls
+            runComparisonButton.disabled = false;
+            resetComparisonButton.disabled = false;
+            compareAlgoSelect1.disabled = false;
+            compareAlgoSelect2.disabled = false;
+            compareStartNodeSelect.disabled = false;
+            compareTargetNodeSelect.disabled = false;
+            compareSpeedSlider.disabled = false;
+            modeSelect.disabled = false; // Re-enable mode switching
+            showModal("Comparison Complete!", "Check the results below the canvases.");
+        }
+
+        // Helper function for MST total weight calculation
+        function calculateMstWeight(mstEdges, graphData) {
+            let totalWeight = 0;
+            const addedEdges = new Set();
+            mstEdges.forEach(edgeStr => {
+                // Ensure we don't count bidirectional edges twice
+                if (!addedEdges.has(edgeStr) && !addedEdges.has(edgeStr.split('-').reverse().join('-'))) {
+                    const [from, to] = edgeStr.split('-');
+                    const edgeObj = graphData[from].find(e => e.node === to);
+                    if (edgeObj) {
+                        totalWeight += edgeObj.weight;
+                        addedEdges.add(edgeStr);
+                    }
+                }
+            });
+            return totalWeight;
+        }
+
+        // Separate animate function for comparison mode
+        async function animateStepsForComparison(context, graphData, nodePositionsData, steps, speed) {
+             for (const step of steps) {
+                if (step.currentNode !== undefined) {
+                    const visitedSet = step.visitedNodes ? new Set(step.visitedNodes) : new Set();
+                    const queueOrStack = step.queueOrStack || [];
+                    const distances = step.distances || {};
+                    const path = step.path || [];
+                    const mstEdges = step.mstEdges ? new Set(step.mstEdges) : new Set();
+                    const current = step.currentNode;
+
+                    drawGraph(context, graphData, nodePositionsData, {
+                        visited: visitedSet,
+                        queue: queueOrStack,
+                        stack: queueOrStack,
+                        dijkstraDistances: distances,
+                        path: path,
+                        mstEdges: mstEdges,
+                        current: current
+                    });
+                }
+                
+                if (step.distanceMatrix) {
+                    // For comparison, just draw the final matrix state, or a simplified step
+                     const nodesArr = Object.keys(graphData).sort();
+                     drawGraph(context, graphData, nodePositionsData, { highlightedNode: nodesArr[step.highlightI] });
+                }
+                 await new Promise(resolve => setTimeout(resolve, speed));
+            }
+            // Final draw to show final state clearly
+             const finalStep = steps[steps.length - 1];
+             if(finalStep) {
+                const visitedSet = finalStep.visitedNodes ? new Set(finalStep.visitedNodes) : new Set();
+                const path = finalStep.path || [];
+                const mstEdges = finalStep.mstEdges ? new Set(finalStep.mstEdges) : new Set();
+                 drawGraph(context, graphData, nodePositionsData, {
+                    visited: visitedSet,
+                    path: path,
+                    mstEdges: mstEdges
+                });
+             }
+        }
+
+
+        function displayComparisonResults(result1, result2) {
+            compareResultsDiv.classList.remove('hidden');
+            
+            let result1Html = `<span>${result1.name} Result:</span>`;
+            if (result1.pathLength !== undefined) {
+                result1Html += `<span>Path Length: ${result1.pathLength === Infinity ? 'No Path' : result1.pathLength}</span>`;
+            } else if (result1.visitedCount !== undefined) {
+                result1Html += `<span>Visited Nodes: ${result1.visitedCount}</span>`;
+            } else if (result1.totalWeight !== undefined) {
+                result1Html += `<span>Total MST Weight: ${result1.totalWeight}</span>`;
+            } else if (result1.finalMatrix) {
+                result1Html += `<span>Matrix Calculated</span>`;
+            } else if (result1.error) {
+                result1Html += `<span>Error: ${result1.error}</span>`;
+            }
+            compareResult1Div.innerHTML = result1Html;
+
+            let result2Html = `<span>${result2.name} Result:</span>`;
+            if (result2.pathLength !== undefined) {
+                result2Html += `<span>Path Length: ${result2.pathLength === Infinity ? 'No Path' : result2.pathLength}</span>`;
+            } else if (result2.visitedCount !== undefined) {
+                result2Html += `<span>Visited Nodes: ${result2.visitedCount}</span>`;
+            } else if (result2.totalWeight !== undefined) {
+                result2Html += `<span>Total MST Weight: ${result2.totalWeight}</span>`;
+            } else if (result2.finalMatrix) {
+                result2Html += `<span>Matrix Calculated</span>`;
+            } else if (result2.error) {
+                result2Html += `<span>Error: ${result2.error}</span>`;
+            }
+            compareResult2Div.innerHTML = result2Html;
+        }
+
+
+        // Function to reconstruct path for Floyd-Warshall
+        function reconstructFloydWarshallPath(startNode, endNode, pathMatrix, nodesArr) {
+            const startIndex = nodesArr.indexOf(startNode);
+            const endIndex = nodesArr.indexOf(endNode);
+
+            if (startIndex === -1 || endIndex === -1) {
+                return []; // Nodes not found
+            }
+            if (floydWarshallResult.finalMatrix[startIndex][endIndex] === Infinity || floydWarshallResult.finalMatrix[startIndex][endIndex] === 1_000_000) {
+                return []; // No path exists
+            }
+            if (startIndex === endIndex) {
+                return [startNode]; // Path to itself
+            }
+
+            const path = [];
+            let current = endIndex;
+            // The backend's `previousNodes` isn't sent to the front-end, so we can't reconstruct the full path.
+            // We'll provide a placeholder implementation.
+            return [];
+        }
+
+
+        // Function to reset the current visualization state
+        function resetVisualization() {
+            isAlgorithmRunning = false;
+            // Reset graph-specific states
+            visitedNodes = new Set();
+            queueNodes = [];
+            stackNodes = [];
+            currentNode = null;
+            visitedOrder = [];
+            distances = {};
+            pathNodes = [];
+            floydDistMatrix = []; // Reset FW matrices
+            floydPathMatrix = [];
+            currentFloydPath = []; // Clear specific FW path
+            floydWarshallResult = { finalMatrix: [], pathMatrix: [] }; // Clear stored FW result
+            currentK = -1; currentI = -1; currentJ = -1;
+            distanceMatrixTableDiv.innerHTML = '';
+            mstEdges = new Set();
+            mstTotalWeight = 0;
+            // Reset graph interaction states
+            draggedNode = null;
+            startEdgeNode = null;
+            mouseX = 0;
+            mouseY = 0;
+
+
+            // Reset grid-specific states (only algorithm-related visuals)
+            gridVisited = new Set();
+            gridPath = [];
+            isDrawingWalls = false; // Ensure wall drawing flag is reset
+
+            // Reset chat-specific states
+            chatHistory = [];
+            chatMessagesDiv.innerHTML = '<div class="chat-message bot">Hi there! I\'m AlgoGlimps Buddy. How can I help you with algorithms today?</div>';
+            chatLoadingIndicator.classList.add('hidden'); // Hide loading indicator
+            chatPopup.classList.remove('open'); // Ensure popup is closed on reset
+            chatFab.classList.remove('hidden-fab'); // Ensure FAB is visible on reset
+
+            if (currentMode === 'graph') {
+                drawGraph(ctx, graph, nodePositions, { interactionMode: currentGraphInteractionMode, startEdgeNode, mouseX, mouseY, path: currentFloydPath });
+            } else if (currentMode === 'grid') {
+                // For grid, only clear visited/path, retain start/end/walls
+                drawGrid(gridCtx, gridWalls, gridVisited, gridPath, startGridNode, endGridNode, cellSize); // Redraw grid with existing start/end/walls
+            } else if (currentMode === 'compare') {
+                compareCtx1.clearRect(0, 0, compareCanvas1.width, compareCanvas1.height);
+                compareCtx2.clearRect(0, 0, compareCanvas2.width, compareCanvas2.height);
+                compareResultsDiv.classList.add('hidden');
+                compareResult1Div.innerHTML = '';
+                compareResult2Div.innerHTML = '';
+                // Redraw initial graph state on compare canvases
+                drawGraph(compareCtx1, graph, nodePositions, {});
+                drawGraph(compareCtx2, graph, nodePositions, {});
+            }
+            // Re-enable all controls after reset
+            startButton.disabled = false;
+            resetButton.disabled = false;
+            speedSlider.disabled = false;
+            startNodeSelect.disabled = false;
+            targetNodeSelect.disabled = false;
+            algorithmSelect.disabled = false; // Re-enable algorithm select in nav
+            modeSelect.disabled = false;
+            graphInteractionModeSelect.disabled = false;
+            runGridAlgorithmButton.disabled = false;
+            clearGridButton.disabled = false;
+            gridSpeedSlider.disabled = false;
+            gridInteractionModeSelect.disabled = false;
+            runComparisonButton.disabled = false;
+            resetComparisonButton.disabled = false;
+            compareAlgoSelect1.disabled = false;
+            compareAlgoSelect2.disabled = false;
+            compareStartNodeSelect.disabled = false;
+            compareTargetNodeSelect.disabled = false;
+            compareSpeedSlider.disabled = false;
+            customModal.style.display = 'none'; // Hide modal on reset
+            
+            // Update Floyd-Warshall path selection button state
+            showFloydPathButton.disabled = true; // Disable until FW runs again
+
+            llmExplanationBox.classList.add('hidden'); // Hide LLM explanation on reset
+            llmExplanationContent.innerHTML = ''; // Clear content
+            llmLoadingIndicator.classList.add('hidden'); // Hide loading indicator
+        }
+
+        // --- Gemini API Integration ---
+        async function explainAlgorithmWithGemini(algorithmName) {
+            llmExplanationBox.classList.remove('hidden'); // Show the explanation box
+            llmExplanationContent.innerHTML = ''; // Clear previous content
+            llmLoadingIndicator.classList.remove('hidden'); // Show loading indicator
+            explainAlgoButton.disabled = true; // Disable button during API call
+
+            const prompt = `Explain the ${algorithmName} algorithm in detail, including its time complexity, space complexity, common use cases, and a simple analogy to help understand it. Format the explanation using Markdown, with clear headings and bullet points.`;
+
+            let chatHistoryForExplanation = [];
+            chatHistoryForExplanation.push({ role: "user", parts: [{ text: prompt }] });
+
+            const payload = { contents: chatHistoryForExplanation };
+            const apiKey = 'AIzaSyCG6coSGkxY0Ming4eEZXFa57Eft8uX0W0'; // Use __api_key if available
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // Check if the response was successful (status 200-299)
+                if (!response.ok) {
+                    const errorText = await response.text(); // Get raw error message
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    // Render markdown content
+                    llmExplanationContent.innerHTML = marked.parse(text); // Using marked.js for markdown rendering
+                } else {
+                    llmExplanationContent.textContent = "Failed to get explanation. Please try again.";
+                    console.error("Gemini API response structure unexpected:", result);
+                }
+            } catch (error) {
+                llmExplanationContent.textContent = `Error: ${error.message}. Could not fetch explanation.`;
+                console.error("Error calling Gemini API for explanation:", error);
+            } finally {
+                llmLoadingIndicator.classList.add('hidden'); // Hide loading indicator
+                explainAlgoButton.disabled = false; // Re-enable button
+            }
+        }
+
+        // --- Chatbot Functions ---
+        function addMessageToChat(sender, message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message', sender);
+            messageDiv.innerHTML = marked.parse(message); // Render markdown in chat messages
+            chatMessagesDiv.appendChild(messageDiv);
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; // Scroll to bottom
+        }
+
+        async function sendMessageToGeminiChat(message) {
+            if (message.trim() === '') return;
+
+            addMessageToChat('user', message);
+            chatInput.value = ''; // Clear input
+
+            chatLoadingIndicator.classList.remove('hidden'); // Show loading indicator
+            sendChatButton.disabled = true; // Disable send button
+            chatInput.disabled = true; // Disable input field
+
+            let currentChatHistory = [];
+
+            // If chatHistory is empty, add a system instruction as part of the first user message
+            if (chatHistory.length === 0) {
+                const systemInstruction = "You are AlgoGlimps Buddy, a helpful AI assistant for understanding algorithms. You have context about the user's current view in the AlgoGlimps application. Provide concise and informative answers. If the user asks about the current state, refer to the provided context.";
+                const contextMessage = `The user is currently in the "${currentMode}" mode of the AlgoGlimps application. The selected algorithm is "${getAlgorithmName(currentAlgorithm)}".`;
+                currentChatHistory.push({ role: "user", parts: [{ text: `${systemInstruction}\n\n${contextMessage}\n\nUser's question: ${message}` }] });
+            } else {
+                // For subsequent messages, just add the user's message with context
+                const contextMessage = `The user is currently in the "${currentMode}" mode of the AlgoGlimps application. The selected algorithm is "${getAlgorithmName(currentAlgorithm)}".`;
+                currentChatHistory = [...chatHistory, { role: "user", parts: [{ text: `${contextMessage}\n\nUser's question: ${message}` }] }];
+            }
+
+            const payload = { contents: currentChatHistory };
+            const apiKey = 'AIzaSyCG6coSGkxY0Ming4eEZXFa57Eft8uX0W0'; // Use __api_key if available
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // Check if the response was successful (status 200-299)
+                if (!response.ok) {
+                    const errorText = await response.text(); // Get raw error message
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const botResponse = result.candidates[0].content.parts[0].text;
+                    addMessageToChat('bot', botResponse);
+                    chatHistory.push({ role: "user", parts: [{ text: message }] }); // Add original user message to history
+                    chatHistory.push({ role: "model", parts: [{ text: botResponse }] }); // Add bot response to history
+                } else {
+                    addMessageToChat('bot', "Sorry, I couldn't get a response. Please try again.");
+                    console.error("Gemini API chat response structure unexpected:", result);
+                }
+            } catch (error) {
+                addMessageToChat('bot', `Error: ${error.message}. Could not connect to AlgoGlimps Buddy.`);
+                console.error("Error calling Gemini API for chat:", error);
+            } finally {
+                chatLoadingIndicator.classList.add('hidden'); // Hide loading indicator
+                sendChatButton.disabled = false; // Re-enable send button
+                chatInput.disabled = false; // Re-enable input field
+                chatInput.focus(); // Focus input field
+            }
+        }
+
+        // --- Event Listeners ---
+
+        // All event listeners are now attached within window.onload
+        window.onload = function() {
+            // Add marked.js for Markdown rendering
+            const markedScript = document.createElement('script');
+            markedScript.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+            document.head.appendChild(markedScript);
+
+            // Set canvas dimensions based on its container, but cap max width
+            const containerWidth = canvas.parentElement.clientWidth;
+            canvas.width = Math.min(containerWidth * 0.9, 900); // Main Graph canvas
+            canvas.height = 500;
+
+            gridCanvas.width = Math.min(containerWidth * 0.9, 900); // Main Grid canvas
+            gridCanvas.height = 500;
+
+            // Compare canvases are slightly larger for better visibility
+            compareCanvas1.width = Math.min(containerWidth * 0.45, 440);
+            compareCanvas1.height = 400; // Increased height
+            compareCanvas2.width = Math.min(containerWidth * 0.45, 440);
+            compareCanvas2.height = 400; // Increased height
+
+
+            populateNodeSelects();
+            updateUI(); // Initial UI setup
+            drawGraph(ctx, graph, nodePositions, { interactionMode: currentGraphInteractionMode, startEdgeNode, mouseX, mouseY }); // Initial graph draw
+            initializeGrid(gridCtx, true); // Initial grid draw
+
+            modeSelect.addEventListener('change', (event) => {
+                currentMode = event.target.value;
+                updateUI();
+                resetVisualization(); // Reset when mode changes
+            });
+
+            algorithmSelect.addEventListener('change', (event) => {
+                currentAlgorithm = event.target.value;
+                updateUI();
+                resetVisualization(); // Reset when algorithm changes
+            });
+
+            graphInteractionModeSelect.addEventListener('change', (event) => {
+                currentGraphInteractionMode = event.target.value;
+                updateUI(); // Update UI to show/hide edge weight input
+                // Reset any ongoing interaction states when mode changes
+                draggedNode = null;
+                startEdgeNode = null;
+                drawGraph(ctx, graph, nodePositions, { interactionMode: currentGraphInteractionMode, startEdgeNode, mouseX, mouseY, path: currentFloydPath }); // Redraw to clear any temporary lines
+            });
+
+            // Use a single "Start" button for graph algorithms
+            startButton.addEventListener('click', () => {
+                if (!isAlgorithmRunning) {
+                    if (currentMode === 'graph') {
+                        const selectedStartNode = startNodeSelect.value;
+                        const selectedTargetNode = targetNodeSelect.value;
+                        switch (currentAlgorithm) {
+                            case 'bfs':
+                                runGraphAlgorithm('bfs', ctx);
+                                break;
+                            case 'dfs':
+                                runGraphAlgorithm('dfs', ctx);
+                                break;
+                            case 'dijkstra':
+                                runGraphAlgorithm('dijkstra', ctx);
+                                break;
+                            case 'floyd-warshall':
+                                runGraphAlgorithm('floyd-warshall', ctx);
+                                break;
+                            case 'mst':
+                                runGraphAlgorithm('mst', ctx);
+                                break;
+                        }
+                    }
+                }
+            });
+
+            // Event listener for showing Floyd-Warshall path
+            showFloydPathButton.addEventListener('click', () => {
+                const pathStart = floydPathStartNodeSelect.value;
+                const pathEnd = floydPathEndNodeSelect.value;
+                const nodesArr = Object.keys(graph).sort();
+                const startIndex = nodesArr.indexOf(pathStart);
+                const endIndex = nodesArr.indexOf(pathEnd);
+                const pathDistance = floydWarshallResult.finalMatrix[startIndex][endIndex];
+
+                if (floydWarshallResult.finalMatrix.length === 0) {
+                    showModal("Error", "Please run Floyd-Warshall algorithm first to calculate paths.");
+                    return;
+                }
+
+                // The backend doesn't return the path matrix, so we can't reconstruct the full path.
+                // We'll provide a placeholder implementation.
+                if (pathDistance === Infinity || pathDistance === 1_000_000) {
+                     showModal("No Path", `No path found from ${pathStart} to ${pathEnd}.`);
+                } else {
+                     showModal("Path Found!", `Path from ${pathStart} to ${pathEnd} (Distance: ${pathDistance})`);
+                }
+                
+                // For visualization, we can't draw the path without the path matrix, so we'll just re-draw the graph.
+                drawGraph(ctx, graph, nodePositions, { path: [] });
+            });
+
+
+            // New "Run Grid Algorithm" button for grid mode
+            runGridAlgorithmButton.addEventListener('click', () => {
+                if (!isAlgorithmRunning && currentMode === 'grid') {
+                    if (!startGridNode || !endGridNode) {
+                        showModal("Error", "Please set both start (S) and end (E) nodes on the grid first.");
+                        return;
+                    }
+                    gridBFS(gridCtx, gridWalls, startGridNode, endGridNode, cellSize, animationSpeed, {
+                        onComplete: (res) => {
+                            if (res.pathFound) {
+                                showModal("Path Found!", `Shortest path found! Length: ${res.pathLength} steps.`);
+                            } else {
+                                showModal("No Path Found", "Could not find a path from start to end.");
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Event listener for the new Gemini explanation button
+            explainAlgoButton.addEventListener('click', () => {
+                if (currentMode === 'graph') {
+                    explainAlgorithmWithGemini(getAlgorithmName(currentAlgorithm));
+                } else {
+                    showModal("Info", "Detailed explanation is currently available only for Graph algorithms.");
+                }
+            });
+
+
+            resetButton.addEventListener('click', () => {
+                resetVisualization();
+            });
+
+            speedSlider.addEventListener('input', (event) => {
+                animationSpeed = parseInt(event.target.value);
+                speedValueSpan.textContent = `${animationSpeed}ms`;
+            });
+
+            // Grid specific event listeners
+            clearGridButton.addEventListener('click', () => {
+                initializeGrid(gridCtx, true); // Re-initialize to clear any drawings
+                showModal("Grid Cleared", "The grid has been cleared.");
+            });
+
+            gridSpeedSlider.addEventListener('input', (event) => {
+                animationSpeed = parseInt(event.target.value); // Use same animationSpeed for now
+                gridSpeedValueSpan.textContent = `${animationSpeed}ms`;
+            });
+
+            gridInteractionModeSelect.addEventListener('change', (event) => {
+                currentGridInteractionMode = event.target.value;
+                updateUI(); // Update button disabled states
+            });
+
+            // Compare mode event listeners
+            compareAlgoSelect1.addEventListener('change', updateUI);
+            compareAlgoSelect2.addEventListener('change', updateUI);
+            compareStartNodeSelect.addEventListener('change', updateUI); // For Dijkstra target
+            compareTargetNodeSelect.addEventListener('change', updateUI); // For Dijkstra target
+
+            runComparisonButton.addEventListener('click', runComparison);
+            resetComparisonButton.addEventListener('click', () => {
+                resetVisualization();
+            });
+            compareSpeedSlider.addEventListener('input', (event) => {
+                animationSpeed = parseInt(event.target.value); // Use same animationSpeed for compare
+                compareSpeedValueSpan.textContent = `${animationSpeed}ms`;
+            });
+
+            // Chatbot FAB and Popup event listeners
+            chatFab.addEventListener('click', () => {
+                chatPopup.classList.toggle('open');
+                if (chatPopup.classList.contains('open')) {
+                    chatInput.focus();
+                }
+            });
+
+            closeChatButton.addEventListener('click', () => {
+                chatPopup.classList.remove('open');
+            });
+
+            sendChatButton.addEventListener('click', () => sendMessageToGeminiChat(chatInput.value));
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessageToGeminiChat(chatInput.value);
+                }
+            });
+            clearChatButton.addEventListener('click', () => {
+                chatHistory = [];
+                chatMessagesDiv.innerHTML = '<div class="chat-message bot">Hi there! I\'m AlgoGlimps Buddy. How can I help you with algorithms today?</div>';
+                showModal("Chat Cleared", "The chat history has been cleared.");
+            });
+
+
+            // --- Canvas Mouse Event Listeners for Graph Customization ---
+            canvas.addEventListener('mousedown', (e) => {
+                if (isAlgorithmRunning || currentMode !== 'graph') return;
+
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const clickedNode = getNodeAt(x, y, nodePositions);
+
+                if (currentGraphInteractionMode === 'select') {
+                    if (clickedNode) {
+                        draggedNode = clickedNode;
+                    }
+                } else if (currentGraphInteractionMode === 'add-node') {
+                    if (!clickedNode) { // Only add if not clicking on an existing node
+                        addNode(x, y);
+                    }
+                } else if (currentGraphInteractionMode === 'remove-node') {
+                    if (clickedNode) {
+                        removeNode(clickedNode);
+                    } else {
+                        showModal("Error", "Click on a node to remove it.");
+                    }
+                } else if (currentGraphInteractionMode === 'add-edge') {
+                    if (clickedNode) {
+                        if (!startEdgeNode) {
+                            startEdgeNode = clickedNode;
+                        } else if (startEdgeNode !== clickedNode) {
+                            const weight = newEdgeWeightInput.value;
+                            addEdge(startEdgeNode, clickedNode, weight);
+                            startEdgeNode = null; // Reset for next edge
+                        }
+                    } else {
+                        startEdgeNode = null; // Reset if clicked outside a node
+                    }
+                    drawGraph(ctx, graph, nodePositions, { interactionMode: currentGraphInteractionMode, startEdgeNode, mouseX, mouseY, path: currentFloydPath }); // Redraw to clear any temporary lines
+                } else if (currentGraphInteractionMode === 'remove-edge') {
+                    if (clickedNode) {
+                        if (!startEdgeNode) {
+                            startEdgeNode = clickedNode;
+                        } else if (startEdgeNode !== clickedNode) {
+                            removeEdge(startEdgeNode, clickedNode);
+                            startEdgeNode = null; // Reset for next edge
+                        }
+                    } else {
+                        startEdgeNode = null; // Reset if clicked outside a node
+                    }
+                    drawGraph(ctx, graph, nodePositions, { interactionMode: currentGraphInteractionMode, startEdgeNode, mouseX, mouseY, path: currentFloydPath }); // Redraw to clear temporary line if interaction resets
+                }
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (isAlgorithmRunning || currentMode !== 'graph') return;
+
+                const rect = canvas.getBoundingClientRect();
+                const rawMouseX = e.clientX - rect.left;
+                const rawMouseY = e.clientY - rect.top;
+
+                // For drawing temporary edge, mouseX and mouseY are raw canvas coordinates
+                mouseX = rawMouseX;
+                mouseY = rawMouseY;
+
+                // Calculate current scaling factors for unscaling mouse coordinates if dragging
+                const scaleX = canvas.width / REFERENCE_CANVAS_WIDTH;
+                const scaleY = canvas.height / REFERENCE_CANVAS_HEIGHT;
+
+                if (currentGraphInteractionMode === 'select' && draggedNode) {
+                    // Unscale mouse coordinates to update original nodePositions
+                    nodePositions[draggedNode].x = rawMouseX / scaleX;
+                    nodePositions[draggedNode].y = rawMouseY / scaleY;
+                    drawGraph(ctx, graph, nodePositions, { interactionMode: currentGraphInteractionMode, highlightedNode: draggedNode, path: currentFloydPath });
+                } else if (currentGraphInteractionMode === 'add-edge' && startEdgeNode) {
+                    drawGraph(ctx, graph, nodePositions, { interactionMode: currentGraphInteractionMode, startEdgeNode, mouseX, mouseY, path: currentFloydPath }); // MouseX, mouseY are raw canvas coords, so they are fine here.
+                }
+            });
+
+            canvas.addEventListener('mouseup', () => {
+                if (isAlgorithmRunning || currentMode !== 'graph') return;
+                draggedNode = null; // Stop dragging
+                drawGraph(ctx, graph, nodePositions, { interactionMode: currentGraphInteractionMode, startEdgeNode, mouseX, mouseY, path: currentFloydPath }); // Redraw to clear any lingering highlight
+                // startEdgeNode is handled in mousedown for add-edge/remove-edge
+            });
+
+            // --- Canvas Mouse Event Listeners for Grid Customization ---
+            gridCanvas.addEventListener('mousedown', (e) => {
+                if (isAlgorithmRunning || currentMode !== 'grid') return;
+
+                const rect = gridCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const clickedCell = getGridCell(x, y, cellSize);
+
+                if (!clickedCell) return;
+
+                if (currentGridInteractionMode === 'set-start') {
+                    setGridNodeState(clickedCell, 'set-start');
+                } else if (currentGridInteractionMode === 'set-end') {
+                    setGridNodeState(clickedCell, 'set-end');
+                } else if (currentGridInteractionMode === 'add-wall') {
+                    isDrawingWalls = true;
+                    setGridNodeState(clickedCell, 'add-wall');
+                } else if (currentGridInteractionMode === 'remove-wall') {
+                    isDrawingWalls = true;
+                    setGridNodeState(clickedCell, 'remove-wall');
+                }
+            });
+
+            gridCanvas.addEventListener('mousemove', (e) => {
+                if (isAlgorithmRunning || currentMode !== 'grid' || !isDrawingWalls) return;
+
+                const rect = gridCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const currentCell = getGridCell(x, y, cellSize);
+
+                if (!currentCell) return;
+
+                if (currentGridInteractionMode === 'add-wall') {
+                    setGridNodeState(currentCell, 'add-wall');
+                } else if (currentGridInteractionMode === 'remove-wall') {
+                    setGridNodeState(currentCell, 'remove-wall');
+                }
+            });
+
+            gridCanvas.addEventListener('mouseup', () => {
+                if (currentMode !== 'grid') return;
+                isDrawingWalls = false; // Stop drawing walls
+            });
+
+            gridCanvas.addEventListener('mouseleave', () => {
+                if (currentMode !== 'grid') return;
+                isDrawingWalls = false; // Stop drawing walls if mouse leaves canvas
+            });
+
+            // Handle window resize to make canvas responsive
+            window.addEventListener('resize', () => {
+                const containerWidth = canvas.parentElement.clientWidth;
+                canvas.width = Math.min(containerWidth * 0.9, 900);
+                gridCanvas.width = Math.min(containerWidth * 0.9, 900);
+                compareCanvas1.width = Math.min(containerWidth * 0.45, 440);
+                compareCanvas2.width = Math.min(containerWidth * 0.45, 440);
+
+
+                if (currentMode === 'graph') {
+                    drawGraph(ctx, graph, nodePositions, { interactionMode: currentGraphInteractionMode, startEdgeNode, mouseX, mouseY, path: currentFloydPath }); // Redraw graph to fit new canvas size
+                } else if (currentMode === 'grid') {
+                    cellSize = Math.min(gridCanvas.width / GRID_COLS, gridCanvas.height / GRID_ROWS); // Recalculate cellSize
+                    drawGrid(gridCtx, gridWalls, gridVisited, gridPath, startGridNode, endGridNode, cellSize); // Redraw grid to fit new canvas size
+                } else if (currentMode === 'compare') {
+                    drawGraph(compareCtx1, graph, nodePositions, {});
+                    drawGraph(compareCtx2, graph, nodePositions, {});
+                }
+            });
+        }; // End of window.onload
+    </script>
+</body>
+</html>
