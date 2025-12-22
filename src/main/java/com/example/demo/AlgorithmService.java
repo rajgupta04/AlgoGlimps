@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+//Every Algorithms are written right here! 
 public class AlgorithmService {
 
     public List<VisualizationStep> runBfs(GraphData request) {
