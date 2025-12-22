@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 ### AlgoGlimps: A Full-Stack Graph Algorithm Visualizer
 
@@ -91,4 +90,3 @@ Bash
 
 docker run -p 8081:8081 algoglimps
 The application will be accessible at http://localhost:8081 in your browser.
->>>>>>> feature
