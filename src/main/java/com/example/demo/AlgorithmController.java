@@ -8,7 +8,7 @@ import java.util.List;
 @RequestMapping("/api/algorithms")
 @CrossOrigin(origins = "*")
 public class AlgorithmController {
-
+// Rest controller will do the job and handle all the request made via client
     @Autowired
     private AlgorithmService algorithmService;
 
