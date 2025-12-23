@@ -1,15 +1,16 @@
 # AlgoGlimps: Full-Stack Graph Algorithm Visualizer
 
-AlgoGlimps lets you draw graphs in the browser and watch classic algorithms run step by step. This README is intentionally detailed (yes, long) so beginners can follow along without guessing. All commands are kept; pick the ones that match your OS and preferred workflow.
+AlgoGlimps lets you draw graphs in the browser and watch classic algorithms run step by step. This README is intentionally detailed so beginners can follow along without guessing.
 
 ## Overview
 - Build graphs visually (add, move, remove nodes and weighted edges).
 - Run BFS, DFS, Dijkstra, Prim MST, and Floyd-Warshall and watch every step.
 - Use the REST API directly for scripting or experiments.
+- Tech stack: Java 17, Spring Boot 3.5.x, Maven, HTML/JS/Tailwind frontend, Docker optional.
 
 ## Requirements
 - Java 17 (Spring Boot 3.5.x).
-- Maven (or just the bundled wrappers: mvnw on macOS/Linux, mvnw.cmd on Windows).
+- Maven (or the bundled wrappers: `mvnw` / `mvnw.cmd`).
 - Git (to clone) or a ZIP download.
 - Docker (optional, for container builds).
 - A modern browser.
@@ -19,7 +20,7 @@ AlgoGlimps lets you draw graphs in the browser and watch classic algorithms run 
 git clone https://github.com/rajgupta04/AlgoGlimps.git
 cd algoglimps/demo
 ```
-If you downloaded a ZIP, unzip it and open a terminal inside the demo folder.
+If you downloaded a ZIP, unzip it and open a terminal inside the `demo` folder.
 
 ## Run locally (no Docker)
 ### Windows (PowerShell or Command Prompt)
@@ -67,12 +68,12 @@ docker run --pull=always -p 8081:8081 ghcr.io/your-username/algoglimps:latest
 Replace the image name with yours.
 
 ## Common commands (copy-paste ready)
-- Clean build: mvnw.cmd clean package (Windows) or ./mvnw clean package (macOS/Linux)
-- Run app: mvnw.cmd spring-boot:run or ./mvnw spring-boot:run
-- Run jar: java -jar target/demo-0.0.1-SNAPSHOT.jar
-- Build Docker image: docker build -t algoglimps .
-- Run Docker container: docker run -p 8081:8081 algoglimps
-- Force dependency refresh: mvnw.cmd clean package -U or ./mvnw clean package -U
+- Clean build: `mvnw.cmd clean package` (Windows) or `./mvnw clean package` (macOS/Linux)
+- Run app: `mvnw.cmd spring-boot:run` or `./mvnw spring-boot:run`
+- Run jar: `java -jar target/demo-0.0.1-SNAPSHOT.jar`
+- Build Docker image: `docker build -t algoglimps .`
+- Run Docker container: `docker run -p 8081:8081 algoglimps`
+- Force dependency refresh: `mvnw.cmd clean package -U` or `./mvnw clean package -U`
 
 ## Project layout (what lives where)
 - src/main/java/com/example/demo — Spring Boot app and algorithm endpoints.
@@ -127,7 +128,7 @@ curl -X POST http://localhost:8081/api/algorithms/bfs \
 5) Click run to watch the step-by-step visualization.
 
 ## Configuration
-- Port: set server.port=8081 in src/main/resources/application.properties.
+- Port: set `server.port=8081` in `src/main/resources/application.properties`.
 - Security: username/password are empty; authentication is effectively off for the demo.
 
 ## Tests
@@ -139,15 +140,15 @@ mvnw.cmd test
 ```
 
 ## Troubleshooting
-- Port already in use: change server.port to a free port (e.g., 8085), then rerun.
-- Maven wrapper not found: ensure you are inside the demo folder and use mvnw.cmd on Windows or ./mvnw on macOS/Linux.
-- Java not found: install JDK 17 and verify with java -version.
-- Slow Docker builds: docker build --pull -t algoglimps . to refresh base images.
-- Dependency download issues: add -U to force updates (mvnw.cmd clean package -U).
+- Port already in use: change `server.port` to a free port (e.g., 8085), then rerun.
+- Maven wrapper not found: ensure you are inside the demo folder and use `mvnw.cmd` on Windows or `./mvnw` on macOS/Linux.
+- Java not found: install JDK 17 and verify with `java -version`.
+- Slow Docker builds: `docker build --pull -t algoglimps .` to refresh base images.
+- Dependency download issues: add `-U` to force updates (`mvnw.cmd clean package -U`).
 
 ## Cleaning up
 - Stop the Spring Boot app with Ctrl+C in the terminal.
-- Stop Docker container: docker ps to find the container ID, then docker stop <id>.
-- Remove image if needed: docker rmi algoglimps.
+- Stop Docker container: `docker ps` to find the container ID, then `docker stop <id>`.
+- Remove image if needed: `docker rmi algoglimps`.
 
 Happy learning and experimenting!
