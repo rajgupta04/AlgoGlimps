@@ -82,10 +82,7 @@ docker build -t algoglimps .
 Run the container:
 ```bash
 docker run -p 8081:8081 algoglimps
-<<<<<<< HEAD
 The application will be accessible at http://localhost:8081 in your browser.
->>>>>>> feature
-=======
 ```
 Open http://localhost:8081.
 
