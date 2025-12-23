@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 
 ### AlgoGlimps: A Full-Stack Graph Algorithm Visualizer
 
@@ -46,7 +46,7 @@ To run this project locally, follow these steps:
     ```
 
 The application will be accessible at `http://localhost:8081` in your browser.
-=======
+=========
 AlgoGlimps: A Full-Stack Graph Algorithm Visualizer
 AlgoGlimps is an interactive, full-stack web application designed to visualize and teach fundamental graph algorithms. The project provides a dynamic platform for users to build custom graphs and observe the step-by-step execution of algorithms in real-time.
 
@@ -91,4 +91,4 @@ Bash
 
 docker run -p 8081:8081 algoglimps
 The application will be accessible at http://localhost:8081 in your browser.
->>>>>>> feature
+>>>>>>>>> Temporary merge branch 2
