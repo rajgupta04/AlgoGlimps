@@ -1,4 +1,4 @@
-=======
+
 # AlgoGlimps: Full-Stack Graph Algorithm Visualizer
 
 AlgoGlimps lets you draw graphs in the browser and watch classic algorithms run step by step. This README is intentionally detailed (yes, long) so beginners can follow along without guessing. All commands are kept; pick the ones that match your OS and preferred workflow.
