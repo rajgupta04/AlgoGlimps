@@ -823,8 +823,8 @@ function BFS_Grid(grid, startNode, endNode):
         let animationSpeed = 200; // Milliseconds (used for both graph and grid animations)
         let isAlgorithmRunning = false; // Flag to prevent multiple runs
 
-        // The URL of your Spring Boot backend
-        const serverUrl = 'http://localhost:8081';
+        // The URL of your Spring Boot backend (use same origin by default)
+        const serverUrl = window.location.origin;
 
         // DOM Elements
         const modeSelect = document.getElementById('modeSelect');
@@ -2282,50 +2282,40 @@ function BFS_Grid(grid, startNode, endNode):
 
         // --- Gemini API Integration ---
         async function explainAlgorithmWithGemini(algorithmName) {
-            llmExplanationBox.classList.remove('hidden'); // Show the explanation box
-            llmExplanationContent.innerHTML = ''; // Clear previous content
-            llmLoadingIndicator.classList.remove('hidden'); // Show loading indicator
-            explainAlgoButton.disabled = true; // Disable button during API call
+            llmExplanationBox.classList.remove('hidden');
+            llmExplanationContent.innerHTML = '';
+            llmLoadingIndicator.classList.remove('hidden');
+            explainAlgoButton.disabled = true;
 
             const prompt = `Explain the ${algorithmName} algorithm in detail, including its time complexity, space complexity, common use cases, and a simple analogy to help understand it. Format the explanation using Markdown, with clear headings and bullet points.`;
 
-            let chatHistoryForExplanation = [];
-            chatHistoryForExplanation.push({ role: "user", parts: [{ text: prompt }] });
-
-            const payload = { contents: chatHistoryForExplanation };
-            const apiKey = 'AIzaSyCG6coSGkxY0Ming4eEZXFa57Eft8uX0W0'; // Use __api_key if available
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const chatHistoryForExplanation = [{ role: "user", parts: [{ text: prompt }] }];
 
             try {
-                const response = await fetch(apiUrl, {
+                const response = await fetch(`${serverUrl}/api/llm/generate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ contents: chatHistoryForExplanation })
                 });
 
-                // Check if the response was successful (status 200-299)
                 if (!response.ok) {
-                    const errorText = await response.text(); // Get raw error message
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                    const errorText = await response.text();
+                    throw new Error(`Backend responded with ${response.status}: ${errorText}`);
                 }
 
                 const result = await response.json();
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    // Render markdown content
-                    llmExplanationContent.innerHTML = marked.parse(text); // Using marked.js for markdown rendering
+                if (result && result.text) {
+                    llmExplanationContent.innerHTML = marked.parse(result.text);
                 } else {
-                    llmExplanationContent.textContent = "Failed to get explanation. Please try again.";
-                    console.error("Gemini API response structure unexpected:", result);
+                    llmExplanationContent.textContent = 'Failed to get explanation. Please try again.';
+                    console.error('Unexpected LLM response shape:', result);
                 }
             } catch (error) {
                 llmExplanationContent.textContent = `Error: ${error.message}. Could not fetch explanation.`;
-                console.error("Error calling Gemini API for explanation:", error);
+                console.error('Error calling Gemini API for explanation:', error);
             } finally {
-                llmLoadingIndicator.classList.add('hidden'); // Hide loading indicator
-                explainAlgoButton.disabled = false; // Re-enable button
+                llmLoadingIndicator.classList.add('hidden');
+                explainAlgoButton.disabled = false;
             }
         }
 
@@ -2361,15 +2351,11 @@ function BFS_Grid(grid, startNode, endNode):
                 currentChatHistory = [...chatHistory, { role: "user", parts: [{ text: `${contextMessage}\n\nUser's question: ${message}` }] }];
             }
 
-            const payload = { contents: currentChatHistory };
-            const apiKey = 'AIzaSyCG6coSGkxY0Ming4eEZXFa57Eft8uX0W0'; // Use __api_key if available
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
             try {
-                const response = await fetch(apiUrl, {
+                const response = await fetch(`${serverUrl}/api/llm/generate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ contents: currentChatHistory })
                 });
 
                 // Check if the response was successful (status 200-299)
@@ -2379,20 +2365,17 @@ function BFS_Grid(grid, startNode, endNode):
                 }
 
                 const result = await response.json();
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const botResponse = result.candidates[0].content.parts[0].text;
-                    addMessageToChat('bot', botResponse);
-                    chatHistory.push({ role: "user", parts: [{ text: message }] }); // Add original user message to history
-                    chatHistory.push({ role: "model", parts: [{ text: botResponse }] }); // Add bot response to history
+                if (result && result.text) {
+                    addMessageToChat('bot', result.text);
+                    chatHistory.push({ role: "user", parts: [{ text: message }] });
+                    chatHistory.push({ role: "model", parts: [{ text: result.text }] });
                 } else {
                     addMessageToChat('bot', "Sorry, I couldn't get a response. Please try again.");
-                    console.error("Gemini API chat response structure unexpected:", result);
+                    console.error("LLM chat response shape unexpected:", result);
                 }
             } catch (error) {
                 addMessageToChat('bot', `Error: ${error.message}. Could not connect to AlgoGlimps Buddy.`);
-                console.error("Error calling Gemini API for chat:", error);
+                console.error("Error calling backend for chat:", error);
             } finally {
                 chatLoadingIndicator.classList.add('hidden'); // Hide loading indicator
                 sendChatButton.disabled = false; // Re-enable send button
