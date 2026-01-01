@@ -1454,12 +1454,39 @@ def prim(n: int, edges: list[tuple[int,int,int]]) -> int:
         });
 
         function getMonacoLanguage(lang) {
-            switch (lang) {
+            const normalized = (lang || '').toLowerCase();
+            switch (normalized) {
                 case 'java': return 'java';
-                case 'cpp': return 'cpp';
-                case 'python': return 'python';
-                default: return 'javascript';
+                case 'cpp':
+                case 'c++':
+                case 'c': return 'cpp';
+                case 'python':
+                case 'py': return 'python';
+                case 'typescript':
+                case 'ts': return 'typescript';
+                case 'javascript':
+                case 'js': return 'javascript';
+                default: return 'plaintext';
             }
+        }
+
+        const markedCdnUrl = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+        let markedReadyPromise = null;
+
+        function ensureMarkedLoaded() {
+            if (window.marked) return Promise.resolve(window.marked);
+            if (markedReadyPromise) return markedReadyPromise;
+            markedReadyPromise = new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = markedCdnUrl;
+                script.onload = () => resolve(window.marked);
+                script.onerror = (err) => {
+                    console.error('Failed to load marked.js', err);
+                    reject(err);
+                };
+                document.head.appendChild(script);
+            });
+            return markedReadyPromise;
         }
 
         function getSampleCode(algo, lang) {
@@ -1485,6 +1512,117 @@ def prim(n: int, edges: list[tuple[int,int,int]]) -> int:
             const monacoLanguage = getMonacoLanguage(currentEditorLanguage);
             window.monaco.editor.setModelLanguage(codeEditor.getModel(), monacoLanguage);
         }
+        updateGraphInfoContent(currentAlgorithm);
+
+        loadMonaco().then(() => {
+            codeEditor = window.monaco.editor.create(codeEditorElement, {
+                value: getSampleCode(currentAlgorithm, currentEditorLanguage),
+                language: getMonacoLanguage(currentEditorLanguage),
+                theme: 'vs-dark',
+                readOnly: true,
+                automaticLayout: true,
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+            });
+        }).catch(() => {
+            if (codeEditorElement) {
+                codeEditorElement.innerHTML = '<div class="p-4 text-sm text-red-300">Failed to load Monaco editor. Please check your connection.</div>';
+            }
+        });
+
+        if (codeLanguageSelect) {
+            codeLanguageSelect.addEventListener('change', (event) => {
+                currentEditorLanguage = event.target.value;
+                updateEditorContent();
+            });
+        }
+
+
+        // Graph visualization elements (specific to graph mode)
+        const canvas = document.getElementById('visualizationCanvas');
+        const ctx = canvas.getContext('2d');
+        const startButton = document.getElementById('startButton'); // For graph algorithms
+        const resetButton = document.getElementById('resetButton'); // For graph algorithms
+        const speedSlider = document.getElementById('speedSlider'); // For graph algorithms
+        const speedValueSpan = document.getElementById('speedValue');
+        const startNodeSelect = document.getElementById('startNodeSelect');
+        const targetNodeSelect = document.getElementById('targetNodeSelect');
+        const startNodeGroup = document.getElementById('startNodeGroup');
+        const targetNodeGroup = document.getElementById('targetNodeGroup');
+
+        // Graph Customization Elements
+        const graphInteractionModeSelect = document.getElementById('graphInteractionMode');
+        const newEdgeWeightInput = document.getElementById('newEdgeWeight');
+        const newEdgeWeightGroup = document.getElementById('newEdgeWeightGroup');
+
+        // Custom Modal Elements
+        const customModal = document.getElementById('customModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+
+        // Matrix Visualization Elements
+        const matrixContainer = document.getElementById('matrixContainer');
+        const distanceMatrixTableDiv = document.getElementById('distanceMatrixTable');
+
+        // Floyd-Warshall Path Selection Elements
+        const floydPathSelectionGroup = document.getElementById('floydPathSelectionGroup');
+        const floydPathStartNodeSelect = document.getElementById('floydPathStartNode');
+        const floydPathEndNodeSelect = document.getElementById('floydPathEndNode');
+        const showFloydPathButton = document.getElementById('showFloydPathButton');
+        let floydWarshallResult = { finalMatrix: [], pathMatrix: [] }; // Store the result after FW runs
+
+        // MST specific state
+        let mstEdges = new Set(); // Edges that are part of the MST
+        let mstTotalWeight = 0;
+
+        // Grid specific state
+        const GRID_ROWS = 20;
+        const GRID_COLS = 30;
+        let cellSize = 0; // Will be calculated dynamically
+        let grid = []; // 2D array representing the grid (0: empty, 1: wall, 2: start, 3: end, 4: visited, 5: path)
+        let startGridNode = null; // {row, col}
+        let endGridNode = null; // {row, col}
+        let gridWalls = new Set(); // Stores "row-col" strings for wall positions
+        let gridVisited = new Set(); // For grid pathfinding visualization
+        let gridPath = []; // For grid path visualization
+        let isDrawingWalls = false; // Flag for continuous wall drawing
+        let currentGridAlgorithm = 'bfs-grid'; // Default grid algorithm
+
+        // Grid Visualization Elements
+        const gridCanvas = document.getElementById('gridCanvas');
+        const gridCtx = gridCanvas.getContext('2d');
+        const runGridAlgorithmButton = document.getElementById('runGridAlgorithmButton'); // For grid algorithms
+        const clearGridButton = document.getElementById('clearGridButton'); // For grid algorithms
+        const gridSpeedSlider = document.getElementById('gridSpeedSlider');
+        const gridSpeedValueSpan = document.getElementById('gridSpeedValue');
+        const gridInteractionModeSelect = document.getElementById('gridInteractionMode');
+
+        // Compare Mode Elements
+        const compareAlgoSelect1 = document.getElementById('compareAlgoSelect1');
+        const compareAlgoSelect2 = document.getElementById('compareAlgoSelect2');
+        const compareStartNodeSelect = document.getElementById('compareStartNode');
+        const compareTargetNodeSelect = document.getElementById('compareTargetNode');
+        const compareTargetNodeGroup = document.getElementById('compareTargetNodeGroup');
+        const runComparisonButton = document.getElementById('runComparisonButton');
+        const resetComparisonButton = document.getElementById('resetComparisonButton');
+        const compareSpeedSlider = document.getElementById('compareSpeedSlider');
+        const compareSpeedValueSpan = document.getElementById('compareSpeedValue');
+        const compareCanvas1 = document.getElementById('compareCanvas1');
+        const compareCtx1 = compareCanvas1.getContext('2d');
+        const compareCanvas2 = document.getElementById('compareCanvas2');
+        const compareCtx2 = compareCanvas2.getContext('2d');
+        const compareCanvasTitle1 = document.getElementById('compareCanvasTitle1');
+        const compareCanvasTitle2 = document.getElementById('compareCanvasTitle2');
+        const compareResultsDiv = document.getElementById('compareResults');
+        const compareResult1Div = document.getElementById('compareResult1');
+        const compareResult2Div = document.getElementById('compareResult2');
+
+        // LLM Explanation Elements
+        const explainAlgoButton = document.getElementById('explainAlgoButton');
+        const llmExplanationBox = document.getElementById('llmExplanationBox');
+        const llmExplanationContent = document.getElementById('llmExplanationContent');
+        const llmLoadingIndicator = document.getElementById('llmLoadingIndicator');
 
         // Chatbot Elements (now part of the popup)
         const chatFab = document.getElementById('chatFab');
@@ -2821,8 +2959,7 @@ function BFS_Grid(grid, startNode, endNode):
 
                 const result = await response.json();
                 if (result && result.text) {
-                    llmExplanationContent.innerHTML = renderMarkdown(result.text);
-                    syncCodeBlockFromMarkdown(result.text);
+                    llmExplanationContent.innerHTML = marked.parse(result.text);
                 } else {
                     llmExplanationContent.textContent = 'Failed to get explanation. Please try again.';
                     console.error('Unexpected LLM response shape:', result);
@@ -2837,19 +2974,16 @@ function BFS_Grid(grid, startNode, endNode):
         }
 
         // --- Chatbot Functions ---
-        function addMessageToChat(sender, message) {
+        async function addMessageToChat(sender, message) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('chat-message', sender);
-            messageDiv.innerHTML = renderMarkdown(message); // Render markdown in chat messages
+            messageDiv.innerHTML = marked.parse(message); // Render markdown in chat messages
             chatMessagesDiv.appendChild(messageDiv);
             chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; // Scroll to bottom
         }
 
         async function sendMessageToGeminiChat(message) {
             if (message.trim() === '') return;
-
-            await loadMarked();
-
             addMessageToChat('user', message);
             chatInput.value = ''; // Clear input
 
@@ -2884,17 +3018,20 @@ function BFS_Grid(grid, startNode, endNode):
                 }
 
                 const result = await response.json();
-                if (result && result.text) {
-                    addMessageToChat('bot', result.text);
-                    chatHistory.push({ role: "user", parts: [{ text: message }] });
-                    chatHistory.push({ role: "model", parts: [{ text: result.text }] });
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const botResponse = result.candidates[0].content.parts[0].text;
+                    addMessageToChat('bot', botResponse);
+                    chatHistory.push({ role: "user", parts: [{ text: message }] }); // Add original user message to history
+                    chatHistory.push({ role: "model", parts: [{ text: botResponse }] }); // Add bot response to history
                 } else {
                     addMessageToChat('bot', "Sorry, I couldn't get a response. Please try again.");
-                    console.error("LLM chat response shape unexpected:", result);
+                    console.error("Gemini API chat response structure unexpected:", result);
                 }
             } catch (error) {
                 addMessageToChat('bot', `Error: ${error.message}. Could not connect to AlgoGlimps Buddy.`);
-                console.error("Error calling backend for chat:", error);
+                console.error("Error calling Gemini API for chat:", error);
             } finally {
                 chatLoadingIndicator.classList.add('hidden'); // Hide loading indicator
                 sendChatButton.disabled = false; // Re-enable send button
@@ -2907,6 +3044,10 @@ function BFS_Grid(grid, startNode, endNode):
 
         // All event listeners are now attached within window.onload
         window.onload = function() {
+            // Add marked.js for Markdown rendering
+            const markedScript = document.createElement('script');
+            markedScript.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+            document.head.appendChild(markedScript);
             // Set canvas dimensions based on its container, but cap max width
             const containerWidth = canvas.parentElement.clientWidth;
             canvas.width = Math.min(containerWidth * 0.9, 900); // Main Graph canvas
