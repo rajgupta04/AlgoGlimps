@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AlgoGlimps</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -198,6 +199,62 @@
             overflow-x: auto;
             font-family: 'Fira Code', monospace; /* Monospace font for code */
             font-size: 0.9rem;
+        }
+        .markdown-body h1,
+        .markdown-body h2,
+        .markdown-body h3 {
+            margin: 0.75rem 0 0.5rem;
+            color: #111827;
+        }
+        .markdown-body h1 { font-size: 1.35rem; font-weight: 800; }
+        .markdown-body h2 { font-size: 1.15rem; font-weight: 800; }
+        .markdown-body h3 { font-size: 1.05rem; font-weight: 700; }
+        .markdown-body p,
+        .markdown-body li {
+            color: #1f2937;
+            line-height: 1.6;
+        }
+        .markdown-body p { margin: 0.35rem 0; }
+        .markdown-body ul,
+        .markdown-body ol { margin: 0.35rem 0 0.65rem 1.25rem; }
+        .markdown-body li { margin: 0.2rem 0; }
+        .markdown-body hr { border: none; border-top: 1px solid #e5e7eb; margin: 0.75rem 0; }
+        .markdown-body blockquote {
+            border-left: 4px solid #e5e7eb;
+            margin: 0.75rem 0;
+            padding: 0.25rem 0.75rem;
+            color: #374151;
+            background: #f9fafb;
+            border-radius: 0.5rem;
+        }
+        .markdown-body pre code,
+        .markdown-body code {
+            background: #111827;
+            color: #e5e7eb;
+            padding: 0.15rem 0.35rem;
+            border-radius: 0.35rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+        .markdown-body pre {
+            background: #111827;
+            color: #e5e7eb;
+            padding: 0.85rem;
+            border-radius: 0.65rem;
+            overflow-x: auto;
+            margin: 0.65rem 0;
+        }
+        .markdown-body pre code { padding: 0; background: transparent; }
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.75rem 0;
+        }
+        .markdown-body th,
+        .markdown-body td {
+            border: 1px solid #e5e7eb;
+            padding: 0.5rem;
+            text-align: left;
         }
         .input-group {
             display: flex;
@@ -656,8 +713,7 @@ function BFS(graph, startNode):
 
             <div id="llmExplanationBox" class="info-box mt-4 hidden">
                 <h3>Detailed Explanation (Powered by Gemini)</h3>
-                <p id="llmExplanationContent">
-                    </p>
+                <div id="llmExplanationContent" class="markdown-body"></div>
                 <div id="llmLoadingIndicator" class="hidden text-center text-gray-500 mt-2">
                     Generating explanation...
                 </div>
@@ -1358,6 +1414,18 @@ def prim(n: int, edges: list[tuple[int,int,int]]) -> int:
         const monacoBaseUrl = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min';
         let codeEditor;
         let currentEditorLanguage = codeLanguageSelect ? codeLanguageSelect.value : 'java';
+
+        const loadMarked = () => new Promise((resolve) => {
+            if (window.marked && (typeof window.marked === 'function' || typeof window.marked.parse === 'function')) {
+                return resolve(window.marked);
+            }
+
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+            script.onload = () => resolve(window.marked);
+            script.onerror = () => resolve(null);
+            document.head.appendChild(script);
+        });
 
         const loadMonaco = () => new Promise((resolve) => {
             if (window.monaco) {
@@ -2655,12 +2723,85 @@ function BFS_Grid(grid, startNode, endNode):
             llmLoadingIndicator.classList.add('hidden'); // Hide loading indicator
         }
 
+        // --- Markdown helpers (used by LLM responses) ---
+        function normalizeMarkdown(text) {
+            if (!text) return '';
+            let s = text;
+
+            // Ensure headings start on their own line
+            s = s.replace(/\s+(#{1,6}\s+)/g, '\n\n$1');
+
+            // Ensure numbered list items start on their own line
+            s = s.replace(/([^\n])\s+(\d+\.)\s+/g, '$1\n$2 ');
+
+            // Ensure bullet list items start on their own line
+            s = s.replace(/([^\n])\s+([*-])\s+/g, '$1\n$2 ');
+
+            // Ensure blank lines between paragraphs more often
+            s = s.replace(/\n{3,}/g, '\n\n');
+
+            return s.trim();
+        }
+
+        function escapeHtml(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function renderMarkdown(content) {
+            if (!content) return '';
+            // Strip wrapping ```markdown ... ``` fence if present
+            let text = content.trim();
+            const wrapMatch = text.match(/^```(?:markdown|md)?\s*([\s\S]*?)\s*```$/i);
+            if (wrapMatch) {
+                text = wrapMatch[1];
+            }
+            text = normalizeMarkdown(text);
+            if (window.marked) {
+                if (typeof window.marked.parse === 'function') {
+                    return window.marked.parse(text);
+                }
+                if (typeof window.marked === 'function') {
+                    return window.marked(text);
+                }
+            }
+            return `<pre>${escapeHtml(text)}</pre>`;
+        }
+
+        function syncCodeBlockFromMarkdown(markdownText) {
+            if (!markdownText) return;
+            const codeMatch = markdownText.match(/```(\w+)?\s*([\s\S]*?)```/);
+            if (!codeMatch) return;
+
+            const langHint = (codeMatch[1] || '').toLowerCase();
+            const codeBlock = codeMatch[2].trim();
+
+            const supportedLangs = ['java', 'cpp', 'python', 'javascript'];
+            currentEditorLanguage = supportedLangs.includes(langHint) ? langHint : currentEditorLanguage;
+
+            if (codeLanguageSelect) {
+                codeLanguageSelect.value = currentEditorLanguage;
+            }
+
+            if (codeEditor && window.monaco) {
+                const monacoLanguage = getMonacoLanguage(currentEditorLanguage);
+                codeEditor.setValue(codeBlock);
+                window.monaco.editor.setModelLanguage(codeEditor.getModel(), monacoLanguage);
+            }
+        }
+
         // --- Gemini API Integration ---
         async function explainAlgorithmWithGemini(algorithmName) {
             llmExplanationBox.classList.remove('hidden');
             llmExplanationContent.innerHTML = '';
             llmLoadingIndicator.classList.remove('hidden');
             explainAlgoButton.disabled = true;
+
+            await loadMarked();
 
             const prompt = `Explain the ${algorithmName} algorithm in detail, including its time complexity, space complexity, common use cases, and a simple analogy to help understand it. Format the explanation using Markdown, with clear headings and bullet points.`;
 
@@ -2680,7 +2821,8 @@ function BFS_Grid(grid, startNode, endNode):
 
                 const result = await response.json();
                 if (result && result.text) {
-                    llmExplanationContent.innerHTML = marked.parse(result.text);
+                    llmExplanationContent.innerHTML = renderMarkdown(result.text);
+                    syncCodeBlockFromMarkdown(result.text);
                 } else {
                     llmExplanationContent.textContent = 'Failed to get explanation. Please try again.';
                     console.error('Unexpected LLM response shape:', result);
@@ -2698,13 +2840,15 @@ function BFS_Grid(grid, startNode, endNode):
         function addMessageToChat(sender, message) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('chat-message', sender);
-            messageDiv.innerHTML = marked.parse(message); // Render markdown in chat messages
+            messageDiv.innerHTML = renderMarkdown(message); // Render markdown in chat messages
             chatMessagesDiv.appendChild(messageDiv);
             chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; // Scroll to bottom
         }
 
         async function sendMessageToGeminiChat(message) {
             if (message.trim() === '') return;
+
+            await loadMarked();
 
             addMessageToChat('user', message);
             chatInput.value = ''; // Clear input
@@ -2763,11 +2907,6 @@ function BFS_Grid(grid, startNode, endNode):
 
         // All event listeners are now attached within window.onload
         window.onload = function() {
-            // Add marked.js for Markdown rendering
-            const markedScript = document.createElement('script');
-            markedScript.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-            document.head.appendChild(markedScript);
-
             // Set canvas dimensions based on its container, but cap max width
             const containerWidth = canvas.parentElement.clientWidth;
             canvas.width = Math.min(containerWidth * 0.9, 900); // Main Graph canvas
