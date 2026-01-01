@@ -1,0 +1,21 @@
+# Template config for local development.
+# Copy to `application.properties` for local runs OR set env vars as noted.
+# IMPORTANT: Do NOT commit your real API key.
+
+server.port=8081
+logging.level.root=INFO
+
+# Disable default Spring Security login for this demo (leave empty)
+spring.security.user.name=
+spring.security.user.password=
+
+# Gemini configuration
+# Recommended: set env var `GEMINI_API_KEY` instead of writing the key here.
+# - Windows (cmd): set GEMINI_API_KEY=YOUR_KEY
+# - Windows (PowerShell): $env:GEMINI_API_KEY="YOUR_KEY"
+# - macOS/Linux: export GEMINI_API_KEY="YOUR_KEY"
+
+gemini.api.key=${GEMINI_API_KEY:}
+# Model endpoint used by the backend LLM proxy
+# You can change the model here if needed.
+gemini.api.url=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
