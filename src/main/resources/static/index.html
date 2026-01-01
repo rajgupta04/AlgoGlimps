@@ -1454,11 +1454,19 @@ def prim(n: int, edges: list[tuple[int,int,int]]) -> int:
         });
 
         function getMonacoLanguage(lang) {
-            switch (lang) {
+            const normalized = (lang || '').toLowerCase();
+            switch (normalized) {
                 case 'java': return 'java';
-                case 'cpp': return 'cpp';
-                case 'python': return 'python';
-                default: return 'javascript';
+                case 'cpp':
+                case 'c++':
+                case 'c': return 'cpp';
+                case 'python':
+                case 'py': return 'python';
+                case 'typescript':
+                case 'ts': return 'typescript';
+                case 'javascript':
+                case 'js': return 'javascript';
+                default: return 'plaintext';
             }
         }
 
@@ -1484,6 +1492,44 @@ def prim(n: int, edges: list[tuple[int,int,int]]) -> int:
             codeEditor.setValue(code);
             const monacoLanguage = getMonacoLanguage(currentEditorLanguage);
             window.monaco.editor.setModelLanguage(codeEditor.getModel(), monacoLanguage);
+        }
+
+        async function renderMarkdownWithMonaco(container, markdownText) {
+            const content = markdownText || '';
+            container.innerHTML = marked.parse(content);
+            const codeBlocks = Array.from(container.querySelectorAll('pre > code'));
+            if (!codeBlocks.length) return;
+
+            try {
+                const monacoInstance = await loadMonaco();
+                codeBlocks.forEach((codeBlock) => {
+                    const parentPre = codeBlock.parentElement;
+                    const langMatch = (codeBlock.className || '').match(/language-([\w+-]+)/);
+                    const langHint = langMatch ? langMatch[1] : '';
+                    const code = codeBlock.textContent || '';
+
+                    const wrapper = document.createElement('div');
+                    const lines = Math.max(code.split('\n').length, 6);
+                    const height = Math.min(Math.max(lines * 18 + 24, 160), 640);
+                    wrapper.style.height = `${height}px`;
+                    wrapper.classList.add('llm-monaco-wrapper');
+
+                    parentPre.replaceWith(wrapper);
+                    monacoInstance.editor.create(wrapper, {
+                        value: code.trimEnd(),
+                        language: getMonacoLanguage(langHint),
+                        readOnly: true,
+                        automaticLayout: true,
+                        minimap: { enabled: false },
+                        lineNumbers: 'off',
+                        scrollBeyondLastLine: false,
+                        theme: 'vs-dark',
+                        fontSize: 14
+                    });
+                });
+            } catch (err) {
+                console.error('Failed to render Monaco for markdown content', err);
+            }
         }
 
         // Chatbot Elements (now part of the popup)
@@ -2821,8 +2867,7 @@ function BFS_Grid(grid, startNode, endNode):
 
                 const result = await response.json();
                 if (result && result.text) {
-                    llmExplanationContent.innerHTML = renderMarkdown(result.text);
-                    syncCodeBlockFromMarkdown(result.text);
+                    await renderMarkdownWithMonaco(llmExplanationContent, result.text);
                 } else {
                     llmExplanationContent.textContent = 'Failed to get explanation. Please try again.';
                     console.error('Unexpected LLM response shape:', result);
@@ -2837,10 +2882,10 @@ function BFS_Grid(grid, startNode, endNode):
         }
 
         // --- Chatbot Functions ---
-        function addMessageToChat(sender, message) {
+        async function addMessageToChat(sender, message) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('chat-message', sender);
-            messageDiv.innerHTML = renderMarkdown(message); // Render markdown in chat messages
+            await renderMarkdownWithMonaco(messageDiv, message); // Render markdown and code with Monaco
             chatMessagesDiv.appendChild(messageDiv);
             chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; // Scroll to bottom
         }
@@ -2850,7 +2895,7 @@ function BFS_Grid(grid, startNode, endNode):
 
             await loadMarked();
 
-            addMessageToChat('user', message);
+            await addMessageToChat('user', message);
             chatInput.value = ''; // Clear input
 
             chatLoadingIndicator.classList.remove('hidden'); // Show loading indicator
@@ -2885,15 +2930,15 @@ function BFS_Grid(grid, startNode, endNode):
 
                 const result = await response.json();
                 if (result && result.text) {
-                    addMessageToChat('bot', result.text);
+                    await addMessageToChat('bot', result.text);
                     chatHistory.push({ role: "user", parts: [{ text: message }] });
                     chatHistory.push({ role: "model", parts: [{ text: result.text }] });
                 } else {
-                    addMessageToChat('bot', "Sorry, I couldn't get a response. Please try again.");
+                    await addMessageToChat('bot', "Sorry, I couldn't get a response. Please try again.");
                     console.error("LLM chat response shape unexpected:", result);
                 }
             } catch (error) {
-                addMessageToChat('bot', `Error: ${error.message}. Could not connect to AlgoGlimps Buddy.`);
+                await addMessageToChat('bot', `Error: ${error.message}. Could not connect to AlgoGlimps Buddy.`);
                 console.error("Error calling backend for chat:", error);
             } finally {
                 chatLoadingIndicator.classList.add('hidden'); // Hide loading indicator
