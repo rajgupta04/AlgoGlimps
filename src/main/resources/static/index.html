@@ -610,7 +610,6 @@
             </div>
 
             <div class="info-box" id="graphAlgorithmInfoBox">
-<<<<<<< HEAD
                 <h3>Breadth-First Search (BFS) Algorithm</h3>
                 <p>
                     Breadth-First Search (BFS) is an algorithm for traversing or searching tree or graph data structures. It starts at the tree root (or some arbitrary node of a graph, sometimes referred to as a 'search key'), and explores all of the neighbor nodes at the present depth before moving on to the nodes at the next depth level.
@@ -635,33 +634,6 @@ function BFS(graph, startNode):
                 add neighbor to V
                 add neighbor to Q
                 </pre>
-=======
-                <div class="flex flex-col gap-4">
-                    <div class="flex flex-wrap items-start justify-between gap-4">
-                        <div class="space-y-2">
-                            <h3 class="text-lg font-semibold" id="algoInfoHeading">Breadth-First Search (BFS) Algorithm</h3>
-                            <p class="text-sm text-gray-300" id="algoInfoDescPrimary">
-                                Breadth-First Search (BFS) is an algorithm for traversing or searching tree or graph data structures. It explores all neighbor nodes at the current depth before moving to the next depth level.
-                            </p>
-                            <p class="text-sm text-gray-300" id="algoInfoDescSecondary">
-                                BFS is commonly used to find the shortest path in an unweighted graph.
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <label for="codeLanguageSelect" class="text-sm font-semibold text-gray-200">Language</label>
-                            <select id="codeLanguageSelect" class="form-select bg-gray-900 text-gray-100 border-gray-700">
-                                <option value="java">Java</option>
-                                <option value="cpp">C++</option>
-                                <option value="python">Python</option>
-                                <option value="javascript">JavaScript</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-                        <div id="codeEditor" class="h-72 w-full"></div>
-                    </div>
-                </div>
->>>>>>> feature
             </div>
 
             <div id="llmExplanationBox" class="info-box mt-4 hidden">
@@ -709,7 +681,6 @@ function BFS(graph, startNode):
                 <p>
                     You will be able to define start/end points, add walls, and watch the algorithms find paths or generate mazes.
                 </p>
-<<<<<<< HEAD
                 <h3>Pseudocode:</h3>
                 <pre>
 function BFS_Grid(grid, startNode, endNode):
@@ -729,9 +700,6 @@ function BFS_Grid(grid, startNode, endNode):
                 set parentMap[neighbor] = current
                 add neighbor to Q
                     </pre>
-=======
-                <p class="text-sm text-gray-300">Switch the language dropdown in the code panel above to explore BFS implementations while the grid tools evolve.</p>
->>>>>>> feature
             </div>
         </div>
 
@@ -822,11 +790,6 @@ function BFS_Grid(grid, startNode, endNode):
             <button id="modalCloseButton">OK</button>
         </div>
     </div>
-<<<<<<< HEAD
-
-=======
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
->>>>>>> feature
     <script>
         // Global state variables
         let currentMode = 'graph'; // 'graph', 'grid', 'compare'
@@ -847,473 +810,9 @@ function BFS_Grid(grid, startNode, endNode):
         
         const graphAlgorithmTitle = document.getElementById('graphAlgorithmTitle');
         const graphAlgorithmInfoBox = document.getElementById('graphAlgorithmInfoBox');
-<<<<<<< HEAD
         const gridAlgorithmTitle = document.getElementById('gridAlgorithmTitle');
         const gridAlgorithmInfoBox = document.getElementById('gridAlgorithmInfoBox');
 
-=======
-        const algoInfoHeading = document.getElementById('algoInfoHeading');
-        const algoInfoDescPrimary = document.getElementById('algoInfoDescPrimary');
-        const algoInfoDescSecondary = document.getElementById('algoInfoDescSecondary');
-        const codeLanguageSelect = document.getElementById('codeLanguageSelect');
-        const codeEditorElement = document.getElementById('codeEditor');
-        const gridAlgorithmTitle = document.getElementById('gridAlgorithmTitle');
-        const gridAlgorithmInfoBox = document.getElementById('gridAlgorithmInfoBox');
-
-        // Code editor configuration
-        const editorSamples = {
-            bfs: {
-                java: `import java.util.*;
-
-void bfs(Map<Integer, List<Integer>> graph, int start) {
-    Queue<Integer> q = new ArrayDeque<>();
-    Set<Integer> seen = new HashSet<>();
-    q.add(start);
-    seen.add(start);
-
-    while (!q.isEmpty()) {
-        int node = q.poll();
-        System.out.println(node);
-        for (int nei : graph.getOrDefault(node, List.of())) {
-            if (seen.add(nei)) q.add(nei);
-        }
-    }
-}`,
-                cpp: `#include <bits/stdc++.h>
-using namespace std;
-
-void bfs(const unordered_map<int, vector<int>>& g, int start) {
-    queue<int> q;
-    unordered_set<int> seen;
-    q.push(start);
-    seen.insert(start);
-
-    while (!q.empty()) {
-        int node = q.front(); q.pop();
-        cout << node << " ";
-        for (int nei : g.at(node)) {
-            if (!seen.count(nei)) {
-                seen.insert(nei);
-                q.push(nei);
-            }
-        }
-    }
-}`,
-                python: `from collections import deque
-
-def bfs(graph: dict[int, list[int]], start: int) -> None:
-    q = deque([start])
-    seen = {start}
-
-    while q:
-        node = q.popleft()
-        print(node)
-        for nei in graph.get(node, []):
-            if nei not in seen:
-                seen.add(nei)
-                q.append(nei)
-`,
-                javascript: `function bfs(graph, start) {
-  const q = [start];
-  const seen = new Set([start]);
-
-  while (q.length) {
-    const node = q.shift();
-    console.log(node);
-    for (const nei of graph[node] || []) {
-      if (!seen.has(nei)) {
-        seen.add(nei);
-        q.push(nei);
-      }
-    }
-  }
-}`
-            },
-            dfs: {
-                java: `import java.util.*;
-
-void dfs(Map<Integer, List<Integer>> graph, int start) {
-    Set<Integer> seen = new HashSet<>();
-    Deque<Integer> stack = new ArrayDeque<>();
-    stack.push(start);
-
-    while (!stack.isEmpty()) {
-        int node = stack.pop();
-        if (!seen.add(node)) continue;
-        System.out.println(node);
-        for (int nei : graph.getOrDefault(node, List.of())) {
-            stack.push(nei);
-        }
-    }
-}`,
-                cpp: `#include <bits/stdc++.h>
-using namespace std;
-
-void dfs(const unordered_map<int, vector<int>>& g, int start) {
-    vector<int> stack{start};
-    unordered_set<int> seen;
-
-    while (!stack.empty()) {
-        int node = stack.back(); stack.pop_back();
-        if (seen.count(node)) continue;
-        seen.insert(node);
-        cout << node << " ";
-        for (int nei : g.at(node)) stack.push_back(nei);
-    }
-}`,
-                python: `def dfs(graph: dict[int, list[int]], start: int) -> None:
-    stack = [start]
-    seen = set()
-
-    while stack:
-        node = stack.pop()
-        if node in seen:
-            continue
-        seen.add(node)
-        print(node)
-        for nei in graph.get(node, []):
-            stack.append(nei)
-`,
-                javascript: `function dfs(graph, start) {
-  const stack = [start];
-  const seen = new Set();
-
-  while (stack.length) {
-    const node = stack.pop();
-    if (seen.has(node)) continue;
-    seen.add(node);
-    console.log(node);
-    for (const nei of graph[node] || []) stack.push(nei);
-  }
-}`
-            },
-            dijkstra: {
-                java: `import java.util.*;
-
-Map<Integer, Integer> dijkstra(Map<Integer, List<int[]>> graph, int start) {
-    Map<Integer, Integer> dist = new HashMap<>();
-    graph.keySet().forEach(n -> dist.put(n, Integer.MAX_VALUE));
-    dist.put(start, 0);
-    PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
-    pq.add(new int[]{start, 0});
-
-    while (!pq.isEmpty()) {
-        int[] cur = pq.poll();
-        int node = cur[0], d = cur[1];
-        if (d != dist.get(node)) continue;
-        for (int[] edge : graph.getOrDefault(node, List.of())) {
-            int nei = edge[0], w = edge[1];
-            int nd = d + w;
-            if (nd < dist.get(nei)) {
-                dist.put(nei, nd);
-                pq.add(new int[]{nei, nd});
-            }
-        }
-    }
-    return dist;
-}`,
-                cpp: `#include <bits/stdc++.h>
-using namespace std;
-
-unordered_map<int, int> dijkstra(const unordered_map<int, vector<pair<int,int>>>& g, int start) {
-    unordered_map<int, int> dist;
-    for (auto& [n, _] : g) dist[n] = INT_MAX;
-    dist[start] = 0;
-    using P = pair<int,int>;
-    priority_queue<P, vector<P>, greater<P>> pq;
-    pq.push({0, start});
-
-    while (!pq.empty()) {
-        auto [d, node] = pq.top(); pq.pop();
-        if (d != dist[node]) continue;
-        for (auto [nei, w] : g.at(node)) {
-            int nd = d + w;
-            if (nd < dist[nei]) {
-                dist[nei] = nd;
-                pq.push({nd, nei});
-            }
-        }
-    }
-    return dist;
-}`,
-                python: `import heapq
-
-def dijkstra(graph: dict[int, list[tuple[int,int]]], start: int):
-    dist = {n: float('inf') for n in graph}
-    dist[start] = 0
-    pq = [(0, start)]
-
-    while pq:
-        d, node = heapq.heappop(pq)
-        if d != dist[node]:
-            continue
-        for nei, w in graph.get(node, []):
-            nd = d + w
-            if nd < dist[nei]:
-                dist[nei] = nd
-                heapq.heappush(pq, (nd, nei))
-    return dist
-`,
-                javascript: `function dijkstra(graph, start) {
-  const dist = Object.fromEntries(Object.keys(graph).map(n => [n, Infinity]));
-  dist[start] = 0;
-  const pq = [[0, start]];
-
-  while (pq.length) {
-    pq.sort((a, b) => a[0] - b[0]);
-    const [d, node] = pq.shift();
-    if (d !== dist[node]) continue;
-    for (const [nei, w] of graph[node] || []) {
-      const nd = d + w;
-      if (nd < dist[nei]) {
-        dist[nei] = nd;
-        pq.push([nd, nei]);
-      }
-    }
-  }
-  return dist;
-}`
-            },
-            'floyd-warshall': {
-                java: `void floydWarshall(int[][] dist) {
-    int n = dist.length;
-    for (int k = 0; k < n; k++)
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
-}`,
-                cpp: `void floydWarshall(vector<vector<int>>& dist) {
-    int n = dist.size();
-    for (int k = 0; k < n; ++k)
-        for (int i = 0; i < n; ++i)
-            for (int j = 0; j < n; ++j)
-                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
-}`,
-                python: `def floyd_warshall(dist: list[list[int]]) -> None:
-    n = len(dist)
-    for k in range(n):
-        for i in range(n):
-            for j in range(n):
-                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
-`,
-                javascript: `function floydWarshall(dist) {
-  const n = dist.length;
-  for (let k = 0; k < n; k++)
-    for (let i = 0; i < n; i++)
-      for (let j = 0; j < n; j++)
-        dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
-  return dist;
-}`
-            },
-            mst: {
-                java: `import java.util.*;
-
-int prim(int n, List<int[]> edges) {
-    List<List<int[]>> g = new ArrayList<>();
-    for (int i = 0; i < n; i++) g.add(new ArrayList<>());
-    for (int[] e : edges) {
-        int u = e[0], v = e[1], w = e[2];
-        g.get(u).add(new int[]{v, w});
-        g.get(v).add(new int[]{u, w});
-    }
-    boolean[] used = new boolean[n];
-    PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
-    pq.add(new int[]{0, 0});
-    int cost = 0;
-
-    while (!pq.isEmpty()) {
-        int[] cur = pq.poll();
-        int node = cur[0], w = cur[1];
-        if (used[node]) continue;
-        used[node] = true;
-        cost += w;
-        for (int[] edge : g.get(node)) pq.add(edge);
-    }
-    return cost;
-}`,
-                cpp: `#include <bits/stdc++.h>
-using namespace std;
-
-int prim(int n, const vector<tuple<int,int,int>>& edges) {
-    vector<vector<pair<int,int>>> g(n);
-    for (auto [u, v, w] : edges) {
-        g[u].push_back({v, w});
-        g[v].push_back({u, w});
-    }
-    vector<int> used(n);
-    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<>> pq;
-    pq.push({0, 0});
-    int cost = 0;
-    while (!pq.empty()) {
-        auto [w, node] = pq.top(); pq.pop();
-        if (used[node]) continue;
-        used[node] = 1;
-        cost += w;
-        for (auto [nei, nw] : g[node]) pq.push({nw, nei});
-    }
-    return cost;
-}`,
-                python: `import heapq
-
-def prim(n: int, edges: list[tuple[int,int,int]]) -> int:
-    g: list[list[tuple[int,int]]] = [[] for _ in range(n)]
-    for u, v, w in edges:
-        g[u].append((v, w))
-        g[v].append((u, w))
-
-    used = [False] * n
-    pq = [(0, 0)]
-    cost = 0
-
-    while pq:
-        w, node = heapq.heappop(pq)
-        if used[node]:
-            continue
-        used[node] = True
-        cost += w
-        for nei, nw in g[node]:
-            heapq.heappush(pq, (nw, nei))
-    return cost
-`,
-                javascript: `function prim(n, edges) {
-  const g = Array.from({ length: n }, () => []);
-  for (const [u, v, w] of edges) {
-    g[u].push([v, w]);
-    g[v].push([u, w]);
-  }
-  const used = Array(n).fill(false);
-  const pq = [[0, 0]];
-  let cost = 0;
-
-  while (pq.length) {
-    pq.sort((a, b) => a[0] - b[0]);
-    const [w, node] = pq.shift();
-    if (used[node]) continue;
-    used[node] = true;
-    cost += w;
-    for (const [nei, nw] of g[node]) pq.push([nw, nei]);
-  }
-  return cost;
-}`
-            }
-        };
-
-        const algorithmDescriptions = {
-            bfs: {
-                title: 'Breadth-First Search (BFS) Algorithm',
-                primary: 'Breadth-First Search explores neighbors level by level using a queue.',
-                secondary: 'Commonly used to find the shortest path in unweighted graphs.'
-            },
-            dfs: {
-                title: 'Depth-First Search (DFS) Algorithm',
-                primary: 'Depth-First Search explores as far as possible down each branch before backtracking.',
-                secondary: 'Useful for connected components, cycle detection, and topological sorting.'
-            },
-            dijkstra: {
-                title: "Dijkstra's Algorithm",
-                primary: 'Computes the shortest paths from a source to all nodes with non-negative edge weights.',
-                secondary: 'Widely used in routing and navigation systems.'
-            },
-            'floyd-warshall': {
-                title: 'Floyd-Warshall Algorithm',
-                primary: 'All-pairs shortest path algorithm using dynamic programming over a distance matrix.',
-                secondary: 'Handles positive or negative edges (no negative cycles).'
-            },
-            mst: {
-                title: "Minimum Spanning Tree (Prim's Algorithm)",
-                primary: 'Prim builds a spanning tree by greedily expanding from a start node using the cheapest edge.',
-                secondary: 'Great for network design, layout, and clustering.'
-            }
-        };
-
-        const monacoBaseUrl = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min';
-        let codeEditor;
-        let currentEditorLanguage = codeLanguageSelect ? codeLanguageSelect.value : 'java';
-
-        const loadMonaco = () => new Promise((resolve) => {
-            if (window.monaco) {
-                return resolve(window.monaco);
-            }
-
-            const startMonaco = () => {
-                // eslint-disable-next-line no-undef
-                require.config({ paths: { 'vs': `${monacoBaseUrl}/vs` } });
-                // eslint-disable-next-line no-undef
-                require(['vs/editor/editor.main'], () => {
-                    window.monaco.editor.setTheme('vs-dark');
-                    resolve(window.monaco);
-                });
-            };
-
-            // If AMD loader already present, start Monaco immediately
-            if (window.require) {
-                startMonaco();
-                return;
-            }
-
-            const loader = document.createElement('script');
-            loader.src = `${monacoBaseUrl}/vs/loader.min.js`;
-            loader.onload = startMonaco;
-            document.body.appendChild(loader);
-        });
-
-        function getMonacoLanguage(lang) {
-            switch (lang) {
-                case 'java': return 'java';
-                case 'cpp': return 'cpp';
-                case 'python': return 'python';
-                default: return 'javascript';
-            }
-        }
-
-        function getSampleCode(algo, lang) {
-            const algorithmKey = editorSamples[algo] ? algo : 'bfs';
-            const languageKey = editorSamples[algorithmKey][lang] ? lang : 'javascript';
-            return editorSamples[algorithmKey][languageKey] || 'Sample coming soon.';
-        }
-
-        function updateGraphInfoContent(algo) {
-            const info = algorithmDescriptions[algo] || algorithmDescriptions.bfs;
-            algoInfoHeading.textContent = info.title;
-            algoInfoDescPrimary.textContent = info.primary;
-            algoInfoDescSecondary.textContent = info.secondary;
-        }
-
-        function updateEditorContent(algoOverride) {
-            if (!codeEditor || !window.monaco) return;
-            const targetAlgo = algoOverride || currentAlgorithm;
-            const code = getSampleCode(targetAlgo, currentEditorLanguage);
-            codeEditor.setValue(code);
-            const monacoLanguage = getMonacoLanguage(currentEditorLanguage);
-            window.monaco.editor.setModelLanguage(codeEditor.getModel(), monacoLanguage);
-        }
-
-        updateGraphInfoContent(currentAlgorithm);
-
-        loadMonaco().then(() => {
-            codeEditor = window.monaco.editor.create(codeEditorElement, {
-                value: getSampleCode(currentAlgorithm, currentEditorLanguage),
-                language: getMonacoLanguage(currentEditorLanguage),
-                theme: 'vs-dark',
-                readOnly: true,
-                automaticLayout: true,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-            });
-        }).catch(() => {
-            if (codeEditorElement) {
-                codeEditorElement.innerHTML = '<div class="p-4 text-sm text-red-300">Failed to load Monaco editor. Please check your connection.</div>';
-            }
-        });
-
-        if (codeLanguageSelect) {
-            codeLanguageSelect.addEventListener('change', (event) => {
-                currentEditorLanguage = event.target.value;
-                updateEditorContent();
-            });
-        }
-
->>>>>>> feature
 
         // Graph visualization elements (specific to graph mode)
         const canvas = document.getElementById('visualizationCanvas');
@@ -1589,7 +1088,6 @@ def prim(n: int, edges: list[tuple[int,int,int]]) -> int:
                 switch (currentAlgorithm) {
                     case 'bfs':
                         graphAlgorithmTitle.textContent = 'Breadth-First Search (BFS)';
-<<<<<<< HEAD
                         graphAlgorithmInfoBox.innerHTML = `
                             <h3>Breadth-First Search (BFS) Algorithm</h3>
                             <p>BFS is an algorithm for traversing or searching tree or graph data structures. It explores all of the neighbor nodes at the present depth before moving on to the nodes at the next depth level.</p>
@@ -1705,30 +1203,6 @@ function Prim(graph, startNode):
                 update neighbor in priorityQueue
                                 </pre>
                         `;
-=======
-                        updateGraphInfoContent('bfs');
-                        updateEditorContent('bfs');
-                        break;
-                    case 'dfs':
-                        graphAlgorithmTitle.textContent = 'Depth-First Search (DFS)';
-                        updateGraphInfoContent('dfs');
-                        updateEditorContent('dfs');
-                        break;
-                    case 'dijkstra':
-                        graphAlgorithmTitle.textContent = 'Dijkstra\'s Algorithm';
-                        updateGraphInfoContent('dijkstra');
-                        updateEditorContent('dijkstra');
-                        break;
-                    case 'floyd-warshall':
-                        graphAlgorithmTitle.textContent = 'Floyd-Warshall Algorithm';
-                        updateGraphInfoContent('floyd-warshall');
-                        updateEditorContent('floyd-warshall');
-                        break;
-                    case 'mst':
-                        graphAlgorithmTitle.textContent = 'Minimum Spanning Tree (Prim\'s Algorithm)';
-                        updateGraphInfoContent('mst');
-                        updateEditorContent('mst');
->>>>>>> feature
                         break;
                 }
             } else if (currentMode === 'grid') {
@@ -1739,7 +1213,6 @@ function Prim(graph, startNode):
                         This algorithm finds the shortest path between a start and an end point on a grid, avoiding walls.
                     </p>
                     <p>
-<<<<<<< HEAD
                         You will be able to define start/end points, add walls, and watch the algorithms find paths or generate mazes.
                     </p>
                     <h3>Pseudocode:</h3>
@@ -1761,11 +1234,6 @@ function BFS_Grid(grid, startNode, endNode):
                 set parentMap[neighbor] = current
                 add neighbor to Q
                     </pre>
-=======
-                        You can define start/end points, add walls, and watch the algorithms find paths or generate mazes.
-                    </p>
-                    <p class="text-sm text-gray-300">Use the language dropdown above to view code samples in the embedded editor.</p>
->>>>>>> feature
                 `;
             } else if (currentMode === 'compare') {
                 compareCanvasTitle1.textContent = getAlgorithmName(compareAlgoSelect1.value);
