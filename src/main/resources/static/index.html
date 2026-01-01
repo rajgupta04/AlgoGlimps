@@ -1428,6 +1428,25 @@ def prim(n: int, edges: list[tuple[int,int,int]]) -> int:
             }
         }
 
+        const markedCdnUrl = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+        let markedReadyPromise = null;
+
+        function ensureMarkedLoaded() {
+            if (window.marked) return Promise.resolve(window.marked);
+            if (markedReadyPromise) return markedReadyPromise;
+            markedReadyPromise = new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = markedCdnUrl;
+                script.onload = () => resolve(window.marked);
+                script.onerror = (err) => {
+                    console.error('Failed to load marked.js', err);
+                    reject(err);
+                };
+                document.head.appendChild(script);
+            });
+            return markedReadyPromise;
+        }
+
         function getSampleCode(algo, lang) {
             const algorithmKey = editorSamples[algo] ? algo : 'bfs';
             const languageKey = editorSamples[algorithmKey][lang] ? lang : 'javascript';
@@ -1454,7 +1473,18 @@ def prim(n: int, edges: list[tuple[int,int,int]]) -> int:
 
         async function renderMarkdownWithMonaco(container, markdownText) {
             const content = markdownText || '';
-            container.innerHTML = marked.parse(content);
+            let parsedHtml = content;
+
+            try {
+                const markedLib = await ensureMarkedLoaded();
+                if (markedLib && typeof markedLib.parse === 'function') {
+                    parsedHtml = markedLib.parse(content);
+                }
+            } catch (err) {
+                console.error('Marked is not available, falling back to plain text rendering', err);
+            }
+
+            container.innerHTML = parsedHtml;
             const codeBlocks = Array.from(container.querySelectorAll('pre > code'));
             if (!codeBlocks.length) return;
 
@@ -2835,10 +2865,8 @@ function BFS_Grid(grid, startNode, endNode):
 
         // All event listeners are now attached within window.onload
         window.onload = function() {
-            // Add marked.js for Markdown rendering
-            const markedScript = document.createElement('script');
-            markedScript.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-            document.head.appendChild(markedScript);
+            // Ensure marked is loaded before any LLM rendering
+            ensureMarkedLoaded().catch((err) => console.error('marked preload failed', err));
 
             // Set canvas dimensions based on its container, but cap max width
             const containerWidth = canvas.parentElement.clientWidth;
